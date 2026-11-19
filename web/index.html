@@ -87,7 +87,7 @@
             </div>
             <div class="metric-cell">
                 <div class="metric-label">Checados &le; 4h</div>
-                <div class="metric-num is-ok" id="kpiCobertura4h">—</div>
+                <div class="metric-num" id="kpiCobertura4h">—</div>
                 <div class="metric-note">Último alerta</div>
             </div>
             <div class="metric-cell">
@@ -102,7 +102,7 @@
             </div>
             <div class="metric-cell">
                 <div class="metric-label">Sem backup</div>
-                <div class="metric-num is-warn" id="kpiRedeIncompleta">—</div>
+                <div class="metric-num" id="kpiRedeIncompleta">—</div>
                 <div class="metric-note">Rede incompleta</div>
             </div>
         </section>
@@ -130,9 +130,8 @@
                     <div class="p-3">
                         <div id="mapaRegioes" class="region-grid"></div>
                         <div class="d-flex flex-wrap gap-3 mt-3 pt-2 border-top small text-muted">
-                            <span><strong style="color:#b91c1c;">|</strong> Crítico / ajuda</span>
-                            <span><strong style="color:#b45309;">|</strong> Pendentes em aberto</span>
-                            <span><strong style="color:#166534;">|</strong> Sem pendências</span>
+                            <span><strong class="text-danger">|</strong> Crítico / ajuda</span>
+                            <span><strong>·</strong> Clique em uma região para ver totais anonimizados</span>
                         </div>
                     </div>
                 </div>

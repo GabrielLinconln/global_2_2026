@@ -27,7 +27,8 @@ const PlantaoApi = (() => {
                 const timer = setTimeout(() => controller.abort(), 1400);
                 const resp = await fetch(`${base}/api/health`, { signal: controller.signal });
                 clearTimeout(timer);
-                if (resp.ok) {
+                const ct = resp.headers.get('content-type') || '';
+                if (resp.ok && ct.includes('application/json')) {
                     apiBaseUrl = base;
                     modoOnline = true;
                     inicializado = true;
@@ -53,7 +54,7 @@ const PlantaoApi = (() => {
             pill.textContent = 'H2 Online';
         } else {
             pill.className = 'connection-pill offline';
-            pill.textContent = 'Modo Offline';
+            pill.textContent = 'Demo Web (Local)';
         }
     }
 

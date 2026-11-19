@@ -109,8 +109,8 @@ function renderizarMapaRegioes(regioes) {
         const statusTxt = criticos > 0
             ? `<span class="mono fw-semibold text-danger">${criticos} crítico(s)</span>`
             : r.pendentesAtivos > 0
-                ? `<span class="mono fw-semibold" style="color:#b45309;">${r.pendentesAtivos} pend.</span>`
-                : '<span class="mono text-success">OK</span>';
+                ? `<span class="mono text-secondary">${r.pendentesAtivos} pend.</span>`
+                : '<span class="mono text-muted">OK</span>';
 
         return `
             <div class="region-tile ${nivel}" onclick="abrirDetalheRegiao(${r.idRegiao})" role="button" tabindex="0">
