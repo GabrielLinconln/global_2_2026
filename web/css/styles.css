@@ -697,6 +697,266 @@ a {
 }
 
 /* ==========================================================================
+   MOTION & MONITOR CLIMÁTICO INTERATIVO (Calor / Chuva / Escalonamento)
+   ========================================================================== */
+@keyframes pcRevealUp {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.pc-reveal {
+    animation: pcRevealUp 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.connection-pill.online::before {
+    animation: subtleBlink 2.4s ease-in-out infinite;
+}
+
+@keyframes subtleBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+}
+
+.motion-stage {
+    position: relative;
+    overflow: hidden;
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border);
+    padding: 1.15rem 1.25rem 1.05rem;
+}
+
+.motion-bg-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.motion-content {
+    position: relative;
+    z-index: 1;
+}
+
+/* Camada Calor: ondas térmicas sutis em grafite claro */
+.heat-layer {
+    opacity: 0;
+    transition: opacity 0.35s ease;
+}
+
+.motion-stage[data-mode="CALOR"] .heat-layer {
+    opacity: 1;
+}
+
+.heat-ring {
+    transform-origin: 84% 28%;
+    animation: heatExpand 4.8s ease-out infinite;
+}
+
+.heat-ring.r2 { animation-delay: 1.6s; }
+.heat-ring.r3 { animation-delay: 3.2s; }
+
+@keyframes heatExpand {
+    0% { transform: scale(0.55); opacity: 0.32; }
+    100% { transform: scale(1.65); opacity: 0; }
+}
+
+.heat-shimmer {
+    animation: shimmerDrift 5.5s ease-in-out infinite alternate;
+}
+
+@keyframes shimmerDrift {
+    0% { transform: translateY(2px); }
+    100% { transform: translateY(-4px); }
+}
+
+/* Camada Chuva (FloodGuard): filetes de chuva + onda de nível d'água */
+.rain-layer {
+    opacity: 0;
+    transition: opacity 0.35s ease;
+}
+
+.motion-stage[data-mode="CHUVA"] .rain-layer {
+    opacity: 1;
+}
+
+.rain-drop {
+    stroke-dasharray: 12 28;
+    animation: rainFall 1.35s linear infinite;
+}
+
+.rain-drop.d2 { animation-delay: -0.45s; animation-duration: 1.15s; }
+.rain-drop.d3 { animation-delay: -0.9s; animation-duration: 1.5s; }
+
+@keyframes rainFall {
+    from { stroke-dashoffset: 40; }
+    to { stroke-dashoffset: 0; }
+}
+
+.water-wave-path {
+    animation: waveSlide 6s linear infinite;
+}
+
+@keyframes waveSlide {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-120px); }
+}
+
+/* Segmented Mode Switch */
+.mode-switch {
+    display: inline-flex;
+    background: var(--bg-canvas);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 2px;
+    gap: 2px;
+}
+
+.mode-btn {
+    border: none;
+    background: transparent;
+    color: var(--ink-muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.28rem 0.68rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.16s ease;
+}
+
+.mode-btn.is-active {
+    background: var(--ink);
+    color: #ffffff;
+}
+
+/* Pipeline de Escalonamento Animado */
+.flow-track {
+    display: grid;
+    grid-template-columns: 1fr 28px 1fr 28px 1fr 28px 1fr;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+@media (max-width: 768px) {
+    .flow-track {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+    .flow-wire {
+        display: none;
+    }
+}
+
+.flow-node {
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.65rem 0.75rem;
+    transition: border-color 0.25s ease, transform 0.25s ease, background-color 0.25s ease;
+}
+
+.flow-node.is-done {
+    border-color: var(--border-strong);
+    background: var(--bg-subtle);
+}
+
+.flow-node.is-active {
+    border-color: var(--ink);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(24, 24, 27, 0.08);
+}
+
+.flow-node.is-critical-step {
+    border-color: var(--alert-red);
+    background: var(--alert-red-soft);
+}
+
+.flow-node-step {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.67rem;
+    font-weight: 600;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.flow-node-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 0.1rem 0;
+}
+
+.flow-node.is-critical-step .flow-node-title,
+.flow-node.is-critical-step .flow-node-step {
+    color: var(--alert-red);
+}
+
+.flow-node-sub {
+    font-size: 0.74rem;
+    color: var(--ink-secondary);
+}
+
+.flow-wire {
+    height: 16px;
+    width: 100%;
+}
+
+.flow-wire line {
+    stroke: var(--border-strong);
+    stroke-width: 1.5;
+    stroke-dasharray: 4 4;
+}
+
+.flow-wire.is-flowing line {
+    stroke: var(--ink);
+    animation: wireFlow 0.75s linear infinite;
+}
+
+@keyframes wireFlow {
+    from { stroke-dashoffset: 16; }
+    to { stroke-dashoffset: 0; }
+}
+
+.critical-radar {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--alert-red);
+    display: inline-block;
+    position: relative;
+}
+
+.critical-radar::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    border: 1px solid var(--alert-red);
+    animation: radarPing 1.9s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes radarPing {
+    0% { transform: scale(0.8); opacity: 0.8; }
+    100% { transform: scale(2.3); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* ==========================================================================
    IMPRESSÃO OFFLINE
    ========================================================================== */
 .print-only {

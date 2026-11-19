@@ -14,6 +14,10 @@ async function carregarPainel() {
         renderizarKpis(dados.resumo);
         renderizarCriticos(dados.casosCriticos || []);
         renderizarAlertas(dados.alertas || []);
+        const ativo = (dados.alertas || []).find(a => a.status === 'ATIVO');
+        if (ativo && window.PlantaoMotion) {
+            PlantaoMotion.atualizarModoClima(ativo.tipo);
+        }
         regioesMapaCache = dados.mapaRegioes || [];
         renderizarMapaRegioes(regioesMapaCache);
     } catch (erro) {
@@ -22,12 +26,21 @@ async function carregarPainel() {
 }
 
 function renderizarKpis(r) {
-    document.getElementById('kpiIdosos').textContent = r.totalIdosos ?? 0;
-    document.getElementById('kpiVoluntarios').textContent = r.totalVoluntarios ?? 0;
-    document.getElementById('kpiCobertura4h').textContent = `${r.percentualChecados4h ?? 0}%`;
-    document.getElementById('kpiPendentes').textContent = r.pendentes ?? 0;
-    document.getElementById('kpiCriticos').textContent = (r.casosCriticos ?? 0) + (r.precisamAjuda ?? 0);
-    document.getElementById('kpiRedeIncompleta').textContent = r.idososRedeIncompleta ?? 0;
+    if (window.PlantaoMotion) {
+        PlantaoMotion.animarNumero(document.getElementById('kpiIdosos'), r.totalIdosos ?? 0);
+        PlantaoMotion.animarNumero(document.getElementById('kpiVoluntarios'), r.totalVoluntarios ?? 0);
+        PlantaoMotion.animarNumero(document.getElementById('kpiCobertura4h'), r.percentualChecados4h ?? 0, '%');
+        PlantaoMotion.animarNumero(document.getElementById('kpiPendentes'), r.pendentes ?? 0);
+        PlantaoMotion.animarNumero(document.getElementById('kpiCriticos'), (r.casosCriticos ?? 0) + (r.precisamAjuda ?? 0));
+        PlantaoMotion.animarNumero(document.getElementById('kpiRedeIncompleta'), r.idososRedeIncompleta ?? 0);
+    } else {
+        document.getElementById('kpiIdosos').textContent = r.totalIdosos ?? 0;
+        document.getElementById('kpiVoluntarios').textContent = r.totalVoluntarios ?? 0;
+        document.getElementById('kpiCobertura4h').textContent = `${r.percentualChecados4h ?? 0}%`;
+        document.getElementById('kpiPendentes').textContent = r.pendentes ?? 0;
+        document.getElementById('kpiCriticos').textContent = (r.casosCriticos ?? 0) + (r.precisamAjuda ?? 0);
+        document.getElementById('kpiRedeIncompleta').textContent = r.idososRedeIncompleta ?? 0;
+    }
 }
 
 function renderizarCriticos(criticos) {

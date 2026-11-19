@@ -60,7 +60,10 @@
             <div class="critical-box">
                 <div class="critical-box-head">
                     <div>
-                        <div class="critical-box-title">Casos críticos — ação presencial imediata</div>
+                        <div class="critical-box-title d-flex align-items-center gap-2">
+                            <span class="critical-radar" aria-hidden="true"></span>
+                            <span>Casos críticos — ação presencial imediata</span>
+                        </div>
                         <div class="small text-secondary">Titular e reserva não conseguiram contato ou foi solicitada ajuda. Envie alguém ao local e acione:</div>
                     </div>
                     <div class="d-flex flex-wrap gap-2">
@@ -70,6 +73,78 @@
                     </div>
                 </div>
                 <div id="listaCriticos"></div>
+            </div>
+        </section>
+
+        <!-- Monitor Animado de Fluxo Climático e Escalonamento -->
+        <section class="pc-card mb-4" aria-label="Monitor animado de protocolo climático">
+            <div class="pc-card-header">
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                    <span>Protocolo ao vivo</span>
+                    <div class="mode-switch" role="group" aria-label="Alternar simulação de clima">
+                        <button type="button" id="btnModoCalor" class="mode-btn is-active">CALOR</button>
+                        <button type="button" id="btnModoChuva" class="mode-btn">CHUVA</button>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <span id="motionCriterio" class="mono small text-muted d-none d-md-inline"></span>
+                    <button type="button" id="btnSimularFluxo" class="btn btn-sm btn-paper">Simular escalonamento</button>
+                </div>
+            </div>
+            <div id="climateStage" class="motion-stage" data-mode="CALOR">
+                <svg class="motion-bg-svg" viewBox="0 0 900 180" preserveAspectRatio="none" aria-hidden="true">
+                    <!-- Animação sutil de calor (ondas térmicas concêntricas) -->
+                    <g class="heat-layer" fill="none" stroke="#18181b">
+                        <circle class="heat-ring r1" cx="760" cy="48" r="34" stroke-width="1" stroke-opacity="0.14"/>
+                        <circle class="heat-ring r2" cx="760" cy="48" r="34" stroke-width="1" stroke-opacity="0.14"/>
+                        <circle class="heat-ring r3" cx="760" cy="48" r="34" stroke-width="1" stroke-opacity="0.14"/>
+                        <path class="heat-shimmer" d="M 0 152 Q 150 138 300 152 T 600 152 T 900 152" stroke-width="1" stroke-opacity="0.09"/>
+                        <path class="heat-shimmer" d="M 0 166 Q 150 154 300 166 T 600 166 T 900 166" stroke-width="1" stroke-opacity="0.06"/>
+                    </g>
+                    <!-- Animação sutil de chuva + onda d'água (FloodGuard) -->
+                    <g class="rain-layer" fill="none" stroke="#18181b">
+                        <line class="rain-drop" x1="80" y1="0" x2="55" y2="180" stroke-width="1" stroke-opacity="0.11"/>
+                        <line class="rain-drop d2" x1="190" y1="0" x2="165" y2="180" stroke-width="1" stroke-opacity="0.11"/>
+                        <line class="rain-drop d3" x1="310" y1="0" x2="285" y2="180" stroke-width="1" stroke-opacity="0.10"/>
+                        <line class="rain-drop" x1="440" y1="0" x2="415" y2="180" stroke-width="1" stroke-opacity="0.11"/>
+                        <line class="rain-drop d2" x1="580" y1="0" x2="555" y2="180" stroke-width="1" stroke-opacity="0.10"/>
+                        <line class="rain-drop d3" x1="710" y1="0" x2="685" y2="180" stroke-width="1" stroke-opacity="0.11"/>
+                        <line class="rain-drop" x1="835" y1="0" x2="810" y2="180" stroke-width="1" stroke-opacity="0.10"/>
+                        <path class="water-wave-path" d="M 0 162 Q 30 154 60 162 T 120 162 T 180 162 T 240 162 T 300 162 T 360 162 T 420 162 T 480 162 T 540 162 T 600 162 T 660 162 T 720 162 T 780 162 T 840 162 T 900 162 T 960 162 T 1020 162" stroke-width="1.2" stroke-opacity="0.16"/>
+                    </g>
+                </svg>
+
+                <div class="motion-content">
+                    <div class="flow-track">
+                        <div id="flowNode1" class="flow-node is-done">
+                            <div class="flow-node-step">01 · Gatilho</div>
+                            <div class="flow-node-title">Alerta Climático</div>
+                            <div id="nodeAlertaSub" class="flow-node-sub">INMET · Onda de Calor</div>
+                        </div>
+                        <svg id="flowWire1" class="flow-wire is-flowing" viewBox="0 0 28 16"><line x1="0" y1="8" x2="28" y2="8"/></svg>
+
+                        <div id="flowNode2" class="flow-node is-done">
+                            <div class="flow-node-step">02 · 1ª Tentativa</div>
+                            <div class="flow-node-title">Voluntário Titular</div>
+                            <div class="flow-node-sub">Liga pelo celular comum</div>
+                        </div>
+                        <svg id="flowWire2" class="flow-wire is-flowing" viewBox="0 0 28 16"><line x1="0" y1="8" x2="28" y2="8"/></svg>
+
+                        <div id="flowNode3" class="flow-node is-done">
+                            <div class="flow-node-step">03 · Backup</div>
+                            <div class="flow-node-title">Voluntário Reserva</div>
+                            <div class="flow-node-sub">Assume se não atender</div>
+                        </div>
+                        <svg id="flowWire3" class="flow-wire is-flowing" viewBox="0 0 28 16"><line x1="0" y1="8" x2="28" y2="8"/></svg>
+
+                        <div id="flowNode4" class="flow-node is-active is-critical-step">
+                            <div class="flow-node-step">04 · Sem Resposta</div>
+                            <div class="flow-node-title">Crítico no Painel</div>
+                            <div class="flow-node-sub">Visita + 192 / 193 / 199</div>
+                        </div>
+                    </div>
+                    <div id="motionStatusText" class="mono small text-secondary mt-3"></div>
+                </div>
             </div>
         </section>
 
@@ -189,6 +264,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/api.js"></script>
+    <script src="js/motion.js"></script>
     <script src="js/painel.js"></script>
 </body>
 </html>
