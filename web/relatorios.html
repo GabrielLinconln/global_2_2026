@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios SQL e Impacto — Plantão Clima</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark pc-navbar sticky-top" aria-label="Navegação principal">
+            <div class="container">
+                <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+                    <span class="brand-mark"><i class="fas fa-temperature-high"></i></span>
+                    <span>Plantão Clima</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Abrir menu">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="mainNav">
+                    <ul class="navbar-nav me-auto ms-lg-3 gap-1">
+                        <li class="nav-item"><a class="nav-link" href="index.html"><i class="fas fa-gauge-high me-1"></i>Painel</a></li>
+                        <li class="nav-item"><a class="nav-link" href="idosos.html"><i class="fas fa-person-cane me-1"></i>Idosos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="voluntarios.html"><i class="fas fa-hands-helping me-1"></i>Voluntários e Vínculos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="alertas.html"><i class="fas fa-bell me-1"></i>Alertas e Rodada</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="relatorios.html"><i class="fas fa-chart-pie me-1"></i>Relatórios</a></li>
+                    </ul>
+                    <span id="connectionStatus" class="connection-pill offline mt-2 mt-lg-0">
+                        <i class="fas fa-circle-notch fa-spin"></i> Conectando...
+                    </span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <section class="pc-page-header">
+        <div class="container">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div>
+                    <h1><i class="fas fa-chart-pie me-2"></i>Relatórios SQL e Impacto Social</h1>
+                    <p>Indicadores calculados em tempo real via consultas SQL (JOIN + GROUP BY + agregações) e relatório anonimizado para UBS e Defesa Civil.</p>
+                </div>
+                <button type="button" class="btn btn-pc-ghost no-print" onclick="window.print()">
+                    <i class="fas fa-file-export me-2"></i>Imprimir / Salvar PDF (UBS)
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <main class="container">
+        <div id="feedbackRelatorios" class="feedback-zone"></div>
+
+        <!-- Relatorio 1: Cobertura em ate 4 horas -->
+        <section class="pc-card mb-4" aria-label="Percentual de idosos checados em ate 4 horas">
+            <div class="pc-card-header">
+                <span><i class="fas fa-stopwatch text-success me-2"></i>1. Percentual de Idosos Checados em ate 4 Horas (por Alerta)</span>
+                <span class="badge bg-success-subtle text-success">SQL: ALERTA JOIN CHECAGEM + INTERVAL '4' HOUR</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Alerta</th>
+                            <th>Tipo / Status</th>
+                            <th class="text-center">Na Rodada</th>
+                            <th class="text-center">Checados &le; 4h</th>
+                            <th class="text-center">Criticos</th>
+                            <th style="min-width: 200px;">Cobertura em 4h</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyCobertura4h">
+                        <tr><td colspan="6" class="text-center py-4 text-muted">Carregando consulta SQL...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <div class="row g-4 mb-4">
+            <!-- Relatorio 2: Idosos com rede incompleta -->
+            <section class="col-lg-6" aria-label="Idosos com rede incompleta">
+                <div class="pc-card h-100">
+                    <div class="pc-card-header">
+                        <span><i class="fas fa-link-slash text-warning me-2"></i>2. Idosos com Rede Incompleta</span>
+                        <span class="badge bg-warning-subtle text-warning">SQL: LEFT JOIN + HAVING</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Idoso</th>
+                                    <th>Regiao</th>
+                                    <th>Diagnostico</th>
+                                    <th class="text-end no-print">Acao</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyRedeIncompleta">
+                                <tr><td colspan="4" class="text-center py-4 text-muted">Carregando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Relatorio 3: Taxa de nao atendeu por voluntario -->
+            <section class="col-lg-6" aria-label="Taxa de nao atendeu por voluntario">
+                <div class="pc-card h-100">
+                    <div class="pc-card-header">
+                        <span><i class="fas fa-phone-slash text-danger me-2"></i>3. Taxa de "Nao Atendeu" por Voluntario</span>
+                        <span class="badge bg-danger-subtle text-danger">SQL: VOLUNTARIO LEFT JOIN CHECAGEM</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Voluntario</th>
+                                    <th class="text-center">Ligacoes</th>
+                                    <th class="text-center">Nao Atendeu</th>
+                                    <th>Taxa</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyTaxaNaoAtendeu">
+                                <tr><td colspan="4" class="text-center py-4 text-muted">Carregando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Relatorio 4: Agregado e Anonimizado para UBS e Defesa Civil -->
+        <section class="pc-card mb-4" aria-label="Relatorio agregado e anonimizado para UBS e Defesa Civil">
+            <div class="pc-card-header">
+                <span>
+                    <i class="fas fa-shield-heart text-primary me-2"></i>4. Relatorio Agregado e Anonimizado para UBS e Defesa Civil
+                </span>
+                <span class="badge bg-primary text-white"><i class="fas fa-user-shield me-1"></i>LGPD: SEM NOMES PESSOAIS</span>
+            </div>
+            <div class="px-3 pt-3 pb-1">
+                <div class="alert alert-info py-2 small mb-2">
+                    <i class="fas fa-lock me-2"></i><strong>Privacidade garantida:</strong> Este relatorio consolida apenas indicadores territoriais por regiao (nenhum nome, telefone ou endereco individual e enviado a terceiros).
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Regiao / UBS Referencia</th>
+                            <th class="text-center">Idosos</th>
+                            <th class="text-center">Doenca Cronica</th>
+                            <th class="text-center">Sem Ventilacao</th>
+                            <th class="text-center">Area Risco</th>
+                            <th class="text-center">Mob. Reduzida</th>
+                            <th class="text-center">Criticos / Ajuda</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyAgregadoUbs">
+                        <tr><td colspan="7" class="text-center py-4 text-muted">Carregando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Secao de Impacto Social e ODS -->
+        <section class="pc-card p-4 mb-4" aria-label="Evidencias de impacto e ODS da ONU">
+            <h2 class="h5 fw-bold text-primary mb-3"><i class="fas fa-earth-americas me-2"></i>Impacto Mensurado e Conexao com os ODS da ONU</h2>
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <div class="p-3 rounded-3 bg-light border h-100">
+                        <div class="h4 fw-bold text-primary mb-1">5,6 milhoes</div>
+                        <p class="small text-muted mb-0">de pessoas com 60 anos ou mais moram sozinhas no Brasil (<strong>Censo 2022 / IBGE</strong>).</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3 rounded-3 bg-light border h-100">
+                        <div class="h4 fw-bold text-danger mb-1">48 mil mortes</div>
+                        <p class="small text-muted mb-0">em excesso associadas a ondas de calor em 14 regioes metropolitanas entre 2000 e 2018 (<strong>PLOS ONE</strong>).</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3 rounded-3 bg-light border h-100">
+                        <div class="h4 fw-bold text-info mb-1">2.103 alertas</div>
+                        <p class="small text-muted mb-0">emitidos pela Defesa Civil com predominancia de chuvas intensas e alagamentos em areas urbanas.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+                <span class="ods-badge ods-3">ODS 3 · Saude e Bem-Estar</span>
+                <span class="ods-badge ods-11">ODS 11 · Cidades e Comunidades Resilientes</span>
+                <span class="ods-badge ods-13">ODS 13 · Acao contra a Mudanca Global do Clima</span>
+            </div>
+        </section>
+    </main>
+
+    <footer class="pc-footer py-4">
+        <div class="container">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-7">
+                    <div class="fw-bold mb-1"><i class="fas fa-temperature-high text-warning me-2"></i>Plantao Clima — CitizenTech</div>
+                    <small class="opacity-75">O sistema complementa a orientacao oficial e nao substitui o 192, o 193 nem o 199.</small>
+                </div>
+                <div class="col-md-5 text-md-end d-flex flex-wrap gap-2 justify-content-md-end">
+                    <span class="ods-badge ods-3">ODS 3</span>
+                    <span class="ods-badge ods-11">ODS 11</span>
+                    <span class="ods-badge ods-13">ODS 13</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/relatorios.js"></script>
+</body>
+</html>

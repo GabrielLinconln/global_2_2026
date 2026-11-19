@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Idosos Protegidos — Plantão Clima</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark pc-navbar sticky-top" aria-label="Navegação principal">
+            <div class="container">
+                <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+                    <span class="brand-mark"><i class="fas fa-temperature-high"></i></span>
+                    <span>Plantão Clima</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Abrir menu">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="mainNav">
+                    <ul class="navbar-nav me-auto ms-lg-3 gap-1">
+                        <li class="nav-item"><a class="nav-link" href="index.html"><i class="fas fa-gauge-high me-1"></i>Painel</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="idosos.html"><i class="fas fa-person-cane me-1"></i>Idosos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="voluntarios.html"><i class="fas fa-hands-helping me-1"></i>Voluntários e Vínculos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="alertas.html"><i class="fas fa-bell me-1"></i>Alertas e Rodada</a></li>
+                        <li class="nav-item"><a class="nav-link" href="relatorios.html"><i class="fas fa-chart-pie me-1"></i>Relatórios</a></li>
+                    </ul>
+                    <span id="connectionStatus" class="connection-pill offline mt-2 mt-lg-0">
+                        <i class="fas fa-circle-notch fa-spin"></i> Conectando...
+                    </span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <section class="pc-page-header">
+        <div class="container">
+            <h1><i class="fas fa-person-cane me-2"></i>Cadastro de Idosos Protegidos</h1>
+            <p>Dados mínimos (apenas ano de nascimento), consentimento LGPD registrado e cálculo automático de risco para Calor e Chuva.</p>
+        </div>
+    </section>
+
+    <main class="container">
+        <div id="feedbackIdosos" class="feedback-zone"></div>
+
+        <div class="row g-4">
+            <!-- Formulario CRUD -->
+            <section class="col-lg-4" aria-label="Formulario de cadastro de idoso">
+                <div class="pc-card">
+                    <div class="pc-card-header">
+                        <span id="formIdosoTitulo"><i class="fas fa-user-plus text-primary me-2"></i>Cadastrar Novo Idoso</span>
+                        <button type="button" id="btnCancelarEdicao" class="btn btn-sm btn-outline-secondary d-none">Cancelar</button>
+                    </div>
+                    <form id="formIdoso" class="p-3" novalidate>
+                        <input type="hidden" id="idosoId">
+
+                        <div class="mb-3">
+                            <label for="nome" class="form-label fw-semibold">Nome / Como prefere ser chamado *</label>
+                            <input type="text" class="form-control" id="nome" placeholder="Ex.: Dona Rosa M." required minlength="3">
+                            <div class="invalid-feedback">Informe o nome (minimo 3 caracteres).</div>
+                        </div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-7">
+                                <label for="telefone" class="form-label fw-semibold">Telefone (fixo/celular) *</label>
+                                <input type="tel" class="form-control" id="telefone" placeholder="(11) 99999-0000" required>
+                                <div class="invalid-feedback">Informe um telefone com pelo menos 8 digitos.</div>
+                            </div>
+                            <div class="col-5">
+                                <label for="anoNascimento" class="form-label fw-semibold">Ano Nasc. *</label>
+                                <input type="number" class="form-control" id="anoNascimento" min="1900" max="1975" placeholder="1946" required>
+                                <div class="invalid-feedback">Entre 1900 e 1975.</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="idRegiao" class="form-label fw-semibold">Regiao / Territorio *</label>
+                            <select class="form-select" id="idRegiao" required>
+                                <option value="">Selecione a regiao...</option>
+                            </select>
+                            <div class="invalid-feedback">Selecione uma regiao.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="enderecoResumo" class="form-label fw-semibold">Endereco Resumido (visita critica) *</label>
+                            <input type="text" class="form-control" id="enderecoResumo" placeholder="Rua, numero e complemento" required minlength="5">
+                            <div class="invalid-feedback">Informe o endereco resumido (minimo 5 caracteres).</div>
+                        </div>
+
+                        <fieldset class="border rounded-3 p-3 mb-3 bg-light">
+                            <legend class="float-none w-auto px-2 fs-6 fw-bold text-primary">Fatores de Vulnerabilidade</legend>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="doencaCronica">
+                                <label class="form-check-label" for="doencaCronica">
+                                    <strong>Doenca cronica</strong> <span class="badge badge-calor ms-1">Peso Calor</span>
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="casaSemVentilacao">
+                                <label class="form-check-label" for="casaSemVentilacao">
+                                    <strong>Casa sem ventilacao</strong> <span class="badge badge-calor ms-1">Peso Calor</span>
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="areaRisco">
+                                <label class="form-check-label" for="areaRisco">
+                                    <strong>Casa em area de risco</strong> <span class="badge badge-chuva ms-1">Peso Chuva</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="mobilidadeReduzida">
+                                <label class="form-check-label" for="mobilidadeReduzida">
+                                    <strong>Mobilidade reduzida</strong> <span class="badge badge-chuva ms-1">Peso Chuva</span>
+                                </label>
+                            </div>
+                        </fieldset>
+
+                        <div class="mb-3">
+                            <label for="observacoes" class="form-label fw-semibold">Observacoes de cuidado</label>
+                            <textarea class="form-control" id="observacoes" rows="2" placeholder="Ex.: Usa aparelho auditivo, prefere ligacoes pela manha..."></textarea>
+                        </div>
+
+                        <div class="form-check p-3 rounded-3 bg-primary-subtle border border-primary-subtle mb-3">
+                            <input class="form-check-input ms-0 me-2" type="checkbox" id="consentimentoLgpd" required>
+                            <label class="form-check-label small" for="consentimentoLgpd">
+                                <strong>Consentimento LGPD *:</strong> Confirmo que o idoso autorizou participar da rede comunitaria e receber ligacoes em alertas climaticos (apenas dados minimos armazenados).
+                            </label>
+                            <div class="invalid-feedback">O consentimento registrado e obrigatorio.</div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 fw-bold py-2">
+                            <i class="fas fa-floppy-disk me-2"></i><span id="btnSalvarTexto">Salvar Idoso</span>
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Listagem e Filtros -->
+            <section class="col-lg-8" aria-label="Lista de idosos cadastrados">
+                <div class="pc-card">
+                    <div class="pc-card-header">
+                        <span><i class="fas fa-list me-2 text-primary"></i>Idosos Cadastrados (<span id="totalIdososLista">0</span>)</span>
+                        <div class="d-flex flex-wrap gap-2">
+                            <input type="search" id="filtroBusca" class="form-control form-control-sm" style="width: 190px;" placeholder="Buscar por nome ou rua...">
+                            <select id="filtroRegiao" class="form-select form-select-sm" style="width: 170px;">
+                                <option value="">Todas as regioes</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Idoso / Contato</th>
+                                    <th>Regiao &amp; Fatores</th>
+                                    <th class="text-center">Risco Calor</th>
+                                    <th class="text-center">Risco Chuva</th>
+                                    <th class="text-end">Acoes</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaIdosos">
+                                <tr><td colspan="5" class="text-center py-4 text-muted">Carregando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="pc-footer py-4">
+        <div class="container">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-7">
+                    <div class="fw-bold mb-1"><i class="fas fa-temperature-high text-warning me-2"></i>Plantao Clima — CitizenTech</div>
+                    <small class="opacity-75">Privacidade por padrao: nao armazenamos CPF nem data completa de nascimento. Relatorios a UBS sao 100% anonimizados.</small>
+                </div>
+                <div class="col-md-5 text-md-end d-flex flex-wrap gap-2 justify-content-md-end">
+                    <span class="ods-badge ods-3">ODS 3</span>
+                    <span class="ods-badge ods-11">ODS 11</span>
+                    <span class="ods-badge ods-13">ODS 13</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/idosos.js"></script>
+</body>
+</html>

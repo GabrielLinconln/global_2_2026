@@ -1,0 +1,699 @@
+/* ==========================================================================
+   Plantão Clima — CitizenTech Design System (Modern CivicTech UI)
+   Tipografia: Plus Jakarta Sans + Inter | Layout Responsivo + Impressão Offline
+   ========================================================================== */
+
+:root {
+    --pc-bg: #f4f7fb;
+    --pc-surface: #ffffff;
+    --pc-surface-soft: #f8fafc;
+    --pc-border: #e2e8f0;
+    --pc-border-strong: #cbd5e1;
+
+    --pc-slate-950: #0b1220;
+    --pc-slate-900: #0f172a;
+    --pc-slate-800: #1e293b;
+    --pc-slate-700: #334155;
+    --pc-slate-500: #64748b;
+    --pc-slate-400: #94a3b8;
+
+    --pc-brand: #0ea5a4;
+    --pc-brand-dark: #0f766e;
+    --pc-brand-soft: #ccfbf1;
+
+    --pc-accent: #2563eb;
+    --pc-accent-soft: #eff6ff;
+
+    --pc-heat: #ea580c;
+    --pc-heat-bg: #fff7ed;
+    --pc-heat-border: #fed7aa;
+
+    --pc-rain: #2563eb;
+    --pc-rain-bg: #eff6ff;
+    --pc-rain-border: #bfdbfe;
+
+    --pc-critical: #dc2626;
+    --pc-critical-dark: #991b1b;
+    --pc-critical-bg: #fef2f2;
+    --pc-critical-border: #fecaca;
+
+    --pc-ok: #059669;
+    --pc-ok-bg: #ecfdf5;
+    --pc-ok-border: #a7f3d0;
+
+    --pc-warn: #d97706;
+    --pc-warn-bg: #fffbeb;
+    --pc-warn-border: #fde68a;
+
+    --pc-radius: 16px;
+    --pc-radius-sm: 10px;
+    --pc-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.04);
+    --pc-shadow: 0 4px 18px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.04);
+    --pc-shadow-hover: 0 12px 28px rgba(15, 23, 42, 0.10), 0 2px 6px rgba(15, 23, 42, 0.05);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--pc-bg);
+    color: var(--pc-slate-900);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, .navbar-brand, .kpi-value {
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
+    letter-spacing: -0.02em;
+}
+
+main {
+    flex: 1;
+}
+
+/* ==========================================================================
+   NAVBAR — Dark Slate Glass
+   ========================================================================== */
+.pc-navbar {
+    background: rgba(11, 18, 32, 0.94);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0.7rem 0;
+}
+
+.pc-navbar .navbar-brand {
+    font-weight: 800;
+    font-size: 1.18rem;
+    color: #ffffff !important;
+    letter-spacing: -0.03em;
+}
+
+.brand-mark {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #f97316 0%, #0ea5a4 100%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 12px rgba(14, 165, 164, 0.35);
+}
+
+.pc-navbar .nav-link {
+    color: rgba(226, 232, 240, 0.78) !important;
+    font-weight: 500;
+    font-size: 0.9rem;
+    border-radius: 10px;
+    padding: 0.48rem 0.88rem !important;
+    transition: all 0.18s ease;
+}
+
+.pc-navbar .nav-link:hover {
+    color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.pc-navbar .nav-link.active {
+    color: #ffffff !important;
+    background: rgba(14, 165, 164, 0.22);
+    box-shadow: inset 0 0 0 1px rgba(45, 212, 191, 0.35);
+}
+
+/* Status Pill */
+.connection-pill {
+    font-size: 0.76rem;
+    font-weight: 600;
+    padding: 0.34rem 0.8rem;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.42rem;
+    white-space: nowrap;
+}
+
+.connection-pill.online {
+    background: rgba(16, 185, 129, 0.14);
+    color: #6ee7b7;
+    border: 1px solid rgba(52, 211, 153, 0.35);
+}
+
+.connection-pill.offline {
+    background: rgba(245, 158, 11, 0.16);
+    color: #fcd34d;
+    border: 1px solid rgba(251, 191, 36, 0.35);
+}
+
+/* ==========================================================================
+   HERO / HEADER — Atmospheric Dark Climate-Tech
+   ========================================================================== */
+.pc-page-header {
+    background:
+        radial-gradient(circle at 88% 18%, rgba(249, 115, 22, 0.22) 0%, transparent 42%),
+        radial-gradient(circle at 12% 85%, rgba(14, 165, 164, 0.24) 0%, transparent 46%),
+        linear-gradient(135deg, #0b1220 0%, #13223b 58%, #0f2942 100%);
+    color: #ffffff;
+    padding: 2.25rem 0 2.1rem;
+    margin-bottom: 1.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pc-hero-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: #99f6e4;
+    background: rgba(14, 165, 164, 0.16);
+    border: 1px solid rgba(45, 212, 191, 0.32);
+    padding: 0.32rem 0.78rem;
+    border-radius: 999px;
+    margin-bottom: 0.85rem;
+}
+
+.pc-page-header h1 {
+    font-weight: 800;
+    font-size: clamp(1.55rem, 2.8vw, 2.2rem);
+    margin-bottom: 0.45rem;
+    line-height: 1.2;
+}
+
+.pc-page-header p {
+    color: rgba(226, 232, 240, 0.82);
+    font-size: 0.96rem;
+    margin-bottom: 0;
+    max-width: 660px;
+}
+
+/* Botões refinados */
+.btn-pc-primary {
+    background: linear-gradient(135deg, #0ea5a4 0%, #0d9488 100%);
+    color: #ffffff;
+    border: none;
+    font-weight: 700;
+    border-radius: 11px;
+    padding: 0.62rem 1.2rem;
+    box-shadow: 0 6px 18px rgba(14, 165, 164, 0.28);
+    transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.btn-pc-primary:hover {
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 22px rgba(14, 165, 164, 0.38);
+}
+
+.btn-pc-ghost {
+    background: rgba(255, 255, 255, 0.09);
+    color: #f8fafc;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    font-weight: 600;
+    border-radius: 11px;
+    padding: 0.62rem 1.15rem;
+    transition: background-color 0.16s ease;
+}
+
+.btn-pc-ghost:hover {
+    background: rgba(255, 255, 255, 0.16);
+    color: #ffffff;
+}
+
+/* ==========================================================================
+   CARDS & SURFACES
+   ========================================================================== */
+.pc-card {
+    background: var(--pc-surface);
+    border: 1px solid var(--pc-border);
+    border-radius: var(--pc-radius);
+    box-shadow: var(--pc-shadow);
+    overflow: hidden;
+}
+
+.pc-card-header {
+    padding: 1rem 1.35rem;
+    border-bottom: 1px solid var(--pc-border);
+    background: #ffffff;
+    font-weight: 700;
+    font-size: 0.96rem;
+    color: var(--pc-slate-900);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   BANNER CRÍTICO — Elegante, compacto, alto impacto sem poluição visual
+   ========================================================================== */
+.critical-panel {
+    background: var(--pc-surface);
+    border: 1px solid var(--pc-critical-border);
+    border-left: 5px solid var(--pc-critical);
+    border-radius: var(--pc-radius);
+    box-shadow: 0 8px 28px rgba(220, 38, 38, 0.10);
+    overflow: hidden;
+}
+
+.critical-panel-head {
+    background: linear-gradient(90deg, #fef2f2 0%, #fff7f7 100%);
+    border-bottom: 1px solid var(--pc-critical-border);
+    padding: 0.95rem 1.35rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.85rem;
+}
+
+.pulse-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--pc-critical);
+    display: inline-block;
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.65);
+    animation: criticalPulse 1.8s infinite;
+}
+
+@keyframes criticalPulse {
+    0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.65); }
+    70% { box-shadow: 0 0 0 9px rgba(220, 38, 38, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+}
+
+.critical-case-row {
+    background: #fffafa;
+    border: 1px solid #fee2e2;
+    border-radius: 12px;
+    padding: 1rem 1.15rem;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.critical-case-row:hover {
+    border-color: #fca5a5;
+    box-shadow: 0 4px 14px rgba(220, 38, 38, 0.08);
+}
+
+.emergency-pill {
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.42rem 0.8rem;
+    border-radius: 9px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.38rem;
+    text-decoration: none;
+    transition: transform 0.15s ease;
+}
+
+.emergency-pill:hover {
+    transform: translateY(-1px);
+}
+
+.emergency-pill.samu {
+    background: #dc2626;
+    color: #ffffff;
+}
+
+.emergency-pill.bombeiros {
+    background: #f59e0b;
+    color: #111827;
+}
+
+.emergency-pill.defesa {
+    background: #1e293b;
+    color: #ffffff;
+}
+
+/* ==========================================================================
+   KPI BENTO CARDS
+   ========================================================================== */
+.kpi-card {
+    background: var(--pc-surface);
+    border: 1px solid var(--pc-border);
+    border-radius: var(--pc-radius);
+    padding: 1.15rem 1.25rem;
+    box-shadow: var(--pc-shadow-sm);
+    height: 100%;
+    position: relative;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.kpi-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--pc-shadow-hover);
+    border-color: var(--pc-border-strong);
+}
+
+.kpi-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--pc-slate-500);
+    margin-bottom: 0.35rem;
+}
+
+.kpi-value {
+    font-size: 1.85rem;
+    font-weight: 800;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 0.25rem;
+}
+
+.kpi-sub {
+    font-size: 0.78rem;
+    color: var(--pc-slate-500);
+}
+
+.kpi-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+   MAPA TERRITORIAL DE RISCO (Módulo FloodGuard)
+   ========================================================================== */
+.region-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
+    gap: 0.9rem;
+}
+
+.region-tile {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 1rem;
+    border: 1px solid var(--pc-border);
+    border-top: 4px solid var(--pc-ok);
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.region-tile:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--pc-shadow-hover);
+}
+
+.region-tile.level-critical {
+    border-top-color: var(--pc-critical);
+    background: linear-gradient(180deg, #fff8f8 0%, #ffffff 45%);
+}
+
+.region-tile.level-warning {
+    border-top-color: var(--pc-warn);
+    background: linear-gradient(180deg, #fffdf5 0%, #ffffff 45%);
+}
+
+.region-tile.level-safe {
+    border-top-color: var(--pc-ok);
+    background: linear-gradient(180deg, #f4fdf9 0%, #ffffff 45%);
+}
+
+/* ==========================================================================
+   BADGES, TAGS E PILLS
+   ========================================================================== */
+.badge-calor {
+    background-color: var(--pc-heat-bg);
+    color: #c2410c;
+    border: 1px solid var(--pc-heat-border);
+    font-weight: 600;
+}
+
+.badge-chuva {
+    background-color: var(--pc-rain-bg);
+    color: #1d4ed8;
+    border: 1px solid var(--pc-rain-border);
+    font-weight: 600;
+}
+
+.badge-critico {
+    background-color: var(--pc-critical);
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.badge-ajuda {
+    background-color: #ea580c;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.badge-atencao {
+    background-color: var(--pc-warn-bg);
+    color: #92400e;
+    border: 1px solid var(--pc-warn-border);
+    font-weight: 600;
+}
+
+.badge-ok {
+    background-color: var(--pc-ok-bg);
+    color: #065f46;
+    border: 1px solid var(--pc-ok-border);
+    font-weight: 600;
+}
+
+.badge-pendente {
+    background-color: #f1f5f9;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+    font-weight: 600;
+}
+
+.risk-pill {
+    font-weight: 800;
+    font-size: 0.78rem;
+    padding: 0.28rem 0.65rem;
+    border-radius: 999px;
+    display: inline-block;
+    font-variant-numeric: tabular-nums;
+}
+
+.risk-pill.high {
+    background: var(--pc-critical-bg);
+    color: var(--pc-critical);
+    border: 1px solid var(--pc-critical-border);
+}
+
+.risk-pill.medium {
+    background: var(--pc-warn-bg);
+    color: #b45309;
+    border: 1px solid var(--pc-warn-border);
+}
+
+.risk-pill.low {
+    background: var(--pc-ok-bg);
+    color: var(--pc-ok);
+    border: 1px solid var(--pc-ok-border);
+}
+
+.vuln-tag {
+    font-size: 0.73rem;
+    font-weight: 600;
+    padding: 0.22rem 0.55rem;
+    border-radius: 999px;
+    background: #f1f5f9;
+    color: var(--pc-slate-700);
+    border: 1px solid #e2e8f0;
+    display: inline-block;
+    margin: 2px 2px 2px 0;
+}
+
+/* ==========================================================================
+   RODADA DE LIGAÇÕES
+   ========================================================================== */
+.call-card {
+    background: var(--pc-surface);
+    border: 1px solid var(--pc-border);
+    border-left: 5px solid var(--pc-accent);
+    border-radius: 14px;
+    padding: 1.15rem 1.25rem;
+    box-shadow: var(--pc-shadow-sm);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.call-card:hover {
+    box-shadow: var(--pc-shadow);
+}
+
+.call-card.status-CRITICO {
+    border-left-color: var(--pc-critical);
+    background: #fffafa;
+}
+
+.call-card.status-PRECISA_AJUDA {
+    border-left-color: #ea580c;
+    background: #fffaf5;
+}
+
+.call-card.status-PRECISA_ATENCAO {
+    border-left-color: var(--pc-warn);
+}
+
+.call-card.status-ESTA_BEM {
+    border-left-color: var(--pc-ok);
+    opacity: 0.92;
+}
+
+.call-action-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.55rem;
+}
+
+@media (max-width: 768px) {
+    .call-action-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Forms & Tables */
+.form-control, .form-select {
+    border-radius: 10px;
+    border-color: var(--pc-border-strong);
+    padding: 0.56rem 0.85rem;
+    font-size: 0.92rem;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--pc-brand);
+    box-shadow: 0 0 0 3px rgba(14, 165, 164, 0.16);
+}
+
+.table th {
+    font-size: 0.74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--pc-slate-500);
+    background-color: #f8fafc;
+    border-bottom-color: var(--pc-border);
+    padding-top: 0.85rem;
+    padding-bottom: 0.85rem;
+}
+
+.table td {
+    padding-top: 0.85rem;
+    padding-bottom: 0.85rem;
+    border-bottom-color: #f1f5f9;
+}
+
+/* Step Cards */
+.step-card {
+    background: #f8fafc;
+    border: 1px solid var(--pc-border);
+    border-radius: 12px;
+    padding: 1rem;
+    height: 100%;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.step-card:hover {
+    background: #ffffff;
+    border-color: var(--pc-brand);
+}
+
+.step-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.55rem;
+}
+
+/* Feedback Banner */
+.feedback-zone {
+    position: sticky;
+    top: 72px;
+    z-index: 1020;
+}
+
+/* Footer */
+.pc-footer {
+    background-color: var(--pc-slate-950);
+    color: rgba(226, 232, 240, 0.82);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    margin-top: 3.5rem;
+}
+
+.ods-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 0.32rem 0.72rem;
+    border-radius: 999px;
+    color: #ffffff;
+}
+
+.ods-3 { background-color: #16a34a; }
+.ods-11 { background-color: #f59e0b; color: #0f172a; }
+.ods-13 { background-color: #0d9488; }
+
+/* ==========================================================================
+   MODO IMPRESSÃO (Lista de Ligações Offline & Relatório UBS/Defesa Civil)
+   ========================================================================== */
+.print-only {
+    display: none;
+}
+
+@media print {
+    body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-size: 11pt;
+    }
+
+    .no-print,
+    .pc-navbar,
+    .pc-footer,
+    .btn,
+    .feedback-zone,
+    .modal {
+        display: none !important;
+    }
+
+    .print-only {
+        display: block !important;
+    }
+
+    .pc-card,
+    .call-card {
+        box-shadow: none !important;
+        border: 1px solid #999999 !important;
+        break-inside: avoid;
+        margin-bottom: 10px !important;
+    }
+
+    .pc-page-header {
+        background: #ffffff !important;
+        color: #000000 !important;
+        border-bottom: 2px solid #000000;
+        padding: 0.5rem 0 !important;
+    }
+
+    .pc-page-header p {
+        color: #333333 !important;
+    }
+}

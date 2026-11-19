@@ -1,0 +1,10 @@
+build/
+data/
+*.class
+*.mv.db
+*.trace.db
+.DS_Store
+Thumbs.db
+.idea/
+*.iml
+.vscode/
