@@ -1,6 +1,6 @@
 /**
  * Lógica da tela Painel (index.html):
- * Carrega KPIs, casos críticos no topo, alertas ativos e Mapa Territorial (módulo FloodGuard).
+ * Carrega indicadores, casos críticos no topo, alertas ativos e situação territorial (módulo FloodGuard).
  */
 document.addEventListener('DOMContentLoaded', () => {
     carregarPainel();
@@ -38,32 +38,27 @@ function renderizarCriticos(criticos) {
         return;
     }
     sec.classList.remove('d-none');
-    const colClass = criticos.length === 1 ? 'col-12' : 'col-lg-6';
     lista.innerHTML = criticos.map(c => `
-        <div class="${colClass}">
-            <div class="critical-case-row d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-                <div>
-                    <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
-                        <span class="badge ${c.status === 'CRITICO' ? 'badge-critico' : 'badge-ajuda'}">
-                            ${c.status === 'CRITICO' ? 'CRÍTICO · SEM RESPOSTA' : 'PRECISA DE AJUDA'}
-                        </span>
-                        <span class="risk-pill high">Risco ${c.pontuacaoRisco}/100</span>
-                        <span class="small text-muted fw-semibold"><i class="fas fa-map-pin me-1"></i>${PlantaoApi.escaparHtml(c.nomeRegiao)}</span>
-                    </div>
-                    <div class="fw-bold fs-5 text-dark">${PlantaoApi.escaparHtml(c.nomeIdoso)}</div>
-                    <div class="small text-secondary mb-1">
-                        <i class="fas fa-location-dot text-danger me-1"></i><strong>${PlantaoApi.escaparHtml(c.enderecoIdoso)}</strong>
-                    </div>
-                    <div class="small text-muted">${PlantaoApi.escaparHtml(c.observacao || '')}</div>
+        <div class="critical-row">
+            <div>
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+                    <span class="tag-status ${c.status === 'CRITICO' ? 'badge-critico' : 'badge-ajuda'}">
+                        ${c.status === 'CRITICO' ? 'CRÍTICO · SEM RESPOSTA' : 'PEDIDO DE AJUDA'}
+                    </span>
+                    <span class="risk-pill high">Risco ${c.pontuacaoRisco}/100</span>
+                    <span class="small text-muted">${PlantaoApi.escaparHtml(c.nomeRegiao)}</span>
                 </div>
-                <div class="d-flex flex-wrap gap-2 flex-shrink-0">
-                    <a href="${PlantaoApi.limparTelefoneHref(c.telefoneIdoso)}" class="btn btn-danger fw-semibold btn-sm px-3">
-                        <i class="fas fa-phone me-1"></i>${PlantaoApi.escaparHtml(c.telefoneIdoso)}
-                    </a>
-                    <a href="alertas.html?alerta=${c.idAlerta}" class="btn btn-outline-danger fw-semibold btn-sm px-3">
-                        Abrir na Rodada <i class="fas fa-arrow-right ms-1"></i>
-                    </a>
-                </div>
+                <div class="fw-semibold fs-6 text-dark">${PlantaoApi.escaparHtml(c.nomeIdoso)}</div>
+                <div class="small text-secondary">${PlantaoApi.escaparHtml(c.enderecoIdoso)}</div>
+                <div class="small text-muted mt-1">${PlantaoApi.escaparHtml(c.observacao || '')}</div>
+            </div>
+            <div class="d-flex flex-wrap gap-2 flex-shrink-0">
+                <a href="${PlantaoApi.limparTelefoneHref(c.telefoneIdoso)}" class="btn btn-sm btn-danger mono">
+                    Ligar ${PlantaoApi.escaparHtml(c.telefoneIdoso)}
+                </a>
+                <a href="alertas.html?alerta=${c.idAlerta}" class="btn btn-sm btn-paper">
+                    Abrir na rodada &rarr;
+                </a>
             </div>
         </div>
     `).join('');
@@ -72,28 +67,29 @@ function renderizarCriticos(criticos) {
 function renderizarAlertas(alertas) {
     const container = document.getElementById('listaAlertasPainel');
     if (!alertas.length) {
-        container.innerHTML = '<div class="text-muted text-center py-3">Nenhum alerta climático registrado.</div>';
+        container.innerHTML = '<div class="p-4 text-muted text-center small">Nenhum alerta climático registrado.</div>';
         return;
     }
-    container.innerHTML = alertas.slice(0, 4).map(a => {
+    container.innerHTML = alertas.slice(0, 4).map((a, idx) => {
         const badgeTipo = a.tipo === 'CALOR'
-            ? '<span class="badge badge-calor"><i class="fas fa-sun me-1"></i>CALOR</span>'
-            : '<span class="badge badge-chuva"><i class="fas fa-cloud-showers-heavy me-1"></i>CHUVA</span>';
+            ? '<span class="tag-status badge-calor">CALOR</span>'
+            : '<span class="tag-status badge-chuva">CHUVA</span>';
         const badgeStatus = a.status === 'ATIVO'
-            ? '<span class="badge bg-danger">ATIVO</span>'
-            : '<span class="badge bg-secondary">ENCERRADO</span>';
+            ? '<span class="tag-status badge-critico">ATIVO</span>'
+            : '<span class="tag-status badge-pendente">ENCERRADO</span>';
+        const borderClass = idx < Math.min(alertas.length, 4) - 1 ? 'border-bottom' : '';
         return `
-            <div class="border rounded-3 p-3 mb-2 ${a.status === 'ATIVO' ? 'bg-light border-danger-subtle' : 'bg-white'}">
+            <div class="p-3 ${borderClass}">
                 <div class="d-flex justify-content-between align-items-center gap-2 mb-1">
                     <div class="d-flex gap-1">${badgeTipo} ${badgeStatus}</div>
-                    <small class="text-muted fw-medium">${PlantaoApi.escaparHtml(a.fonte)}</small>
+                    <span class="mono small text-muted">${PlantaoApi.escaparHtml(a.fonte)}</span>
                 </div>
-                <div class="fw-bold text-dark">${PlantaoApi.escaparHtml(a.titulo)}</div>
+                <div class="fw-semibold text-dark">${PlantaoApi.escaparHtml(a.titulo)}</div>
                 <div class="small text-muted mb-2">
-                    <i class="fas fa-map-pin me-1"></i>${PlantaoApi.escaparHtml(a.nomeRegiao)} · Emitido em ${PlantaoApi.formatarDataHora(a.emitidoEm)}
+                    ${PlantaoApi.escaparHtml(a.nomeRegiao)} · ${PlantaoApi.formatarDataHora(a.emitidoEm)}
                 </div>
-                <a href="alertas.html?alerta=${a.id}" class="btn btn-sm ${a.status === 'ATIVO' ? 'btn-primary' : 'btn-outline-secondary'} rounded-pill px-3">
-                    <i class="fas fa-list-check me-1"></i>Ver Rodada de Ligações
+                <a href="alertas.html?alerta=${a.id}" class="btn btn-sm ${a.status === 'ATIVO' ? 'btn-ink' : 'btn-paper'}">
+                    Abrir rodada
                 </a>
             </div>
         `;
@@ -103,31 +99,31 @@ function renderizarAlertas(alertas) {
 function renderizarMapaRegioes(regioes) {
     const grid = document.getElementById('mapaRegioes');
     if (!regioes.length) {
-        grid.innerHTML = '<div class="text-muted">Nenhuma região monitorada.</div>';
+        grid.innerHTML = '<div class="text-muted small">Nenhuma região monitorada.</div>';
         return;
     }
     grid.innerHTML = regioes.map(r => {
         const criticos = (r.casosCriticosAtivos || 0) + (r.casosAjudaAtivos || 0);
         const nivel = criticos > 0 ? 'level-critical'
             : (r.pendentesAtivos > 0 ? 'level-warning' : 'level-safe');
-        const iconeNivel = criticos > 0 ? 'fa-triangle-exclamation text-danger'
-            : (r.pendentesAtivos > 0 ? 'fa-clock text-warning' : 'fa-circle-check text-success');
+        const statusTxt = criticos > 0
+            ? `<span class="mono fw-semibold text-danger">${criticos} crítico(s)</span>`
+            : r.pendentesAtivos > 0
+                ? `<span class="mono fw-semibold" style="color:#b45309;">${r.pendentesAtivos} pend.</span>`
+                : '<span class="mono text-success">OK</span>';
+
         return `
             <div class="region-tile ${nivel}" onclick="abrirDetalheRegiao(${r.idRegiao})" role="button" tabindex="0">
-                <div class="d-flex justify-content-between align-items-start mb-1">
-                    <strong class="lh-sm text-dark">${PlantaoApi.escaparHtml(r.nomeRegiao)}</strong>
-                    <i class="fas ${iconeNivel} fs-6"></i>
+                <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
+                    <div class="fw-semibold text-dark lh-sm">${PlantaoApi.escaparHtml(r.nomeRegiao)}</div>
+                    ${statusTxt}
                 </div>
                 <div class="small text-muted mb-2">${PlantaoApi.escaparHtml(r.bairroZona)}</div>
-                <div class="d-flex flex-wrap gap-1 mb-2">
-                    <span class="badge badge-calor">Calor: ${r.riscoCalor}</span>
-                    <span class="badge badge-chuva">Chuva: ${r.riscoChuva}</span>
+                <div class="mono text-secondary" style="font-size:0.72rem;">
+                    CALOR: <strong>${r.riscoCalor}</strong> · CHUVA: <strong>${r.riscoChuva}</strong>
                 </div>
-                <div class="d-flex justify-content-between small fw-semibold border-top pt-2 mt-1">
-                    <span class="text-secondary"><i class="fas fa-users me-1"></i>${r.totalIdosos} idoso(s)</span>
-                    <span class="${criticos > 0 ? 'text-danger' : 'text-muted'}">
-                        ${criticos > 0 ? `${criticos} crítico(s)` : `${r.pendentesAtivos} pend.`}
-                    </span>
+                <div class="small text-muted mt-2 pt-2 border-top">
+                    ${r.totalIdosos} idoso(s) acompanhado(s)
                 </div>
             </div>
         `;
@@ -139,20 +135,20 @@ function abrirDetalheRegiao(idRegiao) {
     if (!r) return;
     document.getElementById('modalRegiaoTitulo').textContent = `${r.nomeRegiao} — ${r.bairroZona}`;
     document.getElementById('modalRegiaoCorpo').innerHTML = `
-        <p class="small text-muted mb-3">
+        <p class="small text-secondary mb-3">
             <strong>UBS de referência:</strong> ${PlantaoApi.escaparHtml(r.referenciaUbs)}<br>
-            <em>Dados agregados e anonimizados (módulo territorial herdado do FloodGuard).</em>
+            Dados consolidados por território (sem identificação nominal).
         </p>
         <div class="row g-2 text-center mb-3">
-            <div class="col-4"><div class="p-2 bg-light rounded-3 border"><div class="h5 fw-bold mb-0">${r.totalIdosos}</div><small class="text-muted">Idosos</small></div></div>
-            <div class="col-4"><div class="p-2 bg-danger-subtle rounded-3 border"><div class="h5 fw-bold text-danger mb-0">${r.casosCriticosAtivos + r.casosAjudaAtivos}</div><small class="text-danger">Críticos/Ajuda</small></div></div>
-            <div class="col-4"><div class="p-2 bg-warning-subtle rounded-3 border"><div class="h5 fw-bold text-warning mb-0">${r.pendentesAtivos}</div><small class="text-warning">Pendentes</small></div></div>
+            <div class="col-4"><div class="p-2 border rounded bg-light"><div class="mono h5 fw-bold mb-0">${r.totalIdosos}</div><small class="text-muted">Idosos</small></div></div>
+            <div class="col-4"><div class="p-2 border rounded" style="background:#fef2f2;"><div class="mono h5 fw-bold text-danger mb-0">${r.casosCriticosAtivos + r.casosAjudaAtivos}</div><small class="text-danger">Críticos</small></div></div>
+            <div class="col-4"><div class="p-2 border rounded bg-light"><div class="mono h5 fw-bold mb-0">${r.pendentesAtivos}</div><small class="text-muted">Pendentes</small></div></div>
         </div>
         <ul class="list-group list-group-flush small">
-            <li class="list-group-item d-flex justify-content-between"><span>Com doença crônica</span><strong>${r.comDoencaCronica}</strong></li>
-            <li class="list-group-item d-flex justify-content-between"><span>Casa sem ventilação</span><strong>${r.semVentilacao}</strong></li>
-            <li class="list-group-item d-flex justify-content-between"><span>Casa em área de risco (enchente/encosta)</span><strong>${r.emAreaRisco}</strong></li>
-            <li class="list-group-item d-flex justify-content-between"><span>Mobilidade reduzida</span><strong>${r.comMobilidadeReduzida}</strong></li>
+            <li class="list-group-item d-flex justify-content-between px-0"><span>Com doença crônica</span><strong class="mono">${r.comDoencaCronica}</strong></li>
+            <li class="list-group-item d-flex justify-content-between px-0"><span>Casa sem ventilação</span><strong class="mono">${r.semVentilacao}</strong></li>
+            <li class="list-group-item d-flex justify-content-between px-0"><span>Área de risco (enchente/encosta)</span><strong class="mono">${r.emAreaRisco}</strong></li>
+            <li class="list-group-item d-flex justify-content-between px-0"><span>Mobilidade reduzida</span><strong class="mono">${r.comMobilidadeReduzida}</strong></li>
         </ul>
     `;
     new bootstrap.Modal(document.getElementById('modalRegiao')).show();

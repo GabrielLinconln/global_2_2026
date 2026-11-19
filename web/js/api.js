@@ -50,10 +50,10 @@ const PlantaoApi = (() => {
         if (!pill) return;
         if (modoOnline) {
             pill.className = 'connection-pill online';
-            pill.innerHTML = '<i class="fas fa-database"></i> Java + H2 Online';
+            pill.textContent = 'H2 Online';
         } else {
             pill.className = 'connection-pill offline';
-            pill.innerHTML = '<i class="fas fa-wifi"></i> Modo Offline (Local)';
+            pill.textContent = 'Modo Offline';
         }
     }
 

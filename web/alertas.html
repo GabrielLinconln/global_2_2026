@@ -6,33 +6,31 @@
     <title>Alertas e Rodada de Ligações — Plantão Clima</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
     <link href="css/styles.css" rel="stylesheet">
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-lg navbar-dark pc-navbar sticky-top" aria-label="Navegação principal">
+        <nav class="navbar navbar-expand-lg pc-navbar sticky-top" aria-label="Navegação principal">
             <div class="container">
-                <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
-                    <span class="brand-mark"><i class="fas fa-temperature-high"></i></span>
+                <a class="navbar-brand" href="index.html">
+                    <span class="brand-dot" aria-hidden="true"></span>
                     <span>Plantão Clima</span>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Abrir menu">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="mainNav">
-                    <ul class="navbar-nav me-auto ms-lg-3 gap-1">
-                        <li class="nav-item"><a class="nav-link" href="index.html"><i class="fas fa-gauge-high me-1"></i>Painel</a></li>
-                        <li class="nav-item"><a class="nav-link" href="idosos.html"><i class="fas fa-person-cane me-1"></i>Idosos</a></li>
-                        <li class="nav-item"><a class="nav-link" href="voluntarios.html"><i class="fas fa-hands-helping me-1"></i>Voluntários e Vínculos</a></li>
-                        <li class="nav-item"><a class="nav-link active" href="alertas.html"><i class="fas fa-bell me-1"></i>Alertas e Rodada</a></li>
-                        <li class="nav-item"><a class="nav-link" href="relatorios.html"><i class="fas fa-chart-pie me-1"></i>Relatórios</a></li>
+                    <ul class="navbar-nav me-auto ms-lg-4">
+                        <li class="nav-item"><a class="nav-link" href="index.html">Painel</a></li>
+                        <li class="nav-item"><a class="nav-link" href="idosos.html">Idosos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="voluntarios.html">Voluntários e Vínculos</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="alertas.html">Alertas e Rodada</a></li>
+                        <li class="nav-item"><a class="nav-link" href="relatorios.html">Relatórios</a></li>
                     </ul>
-                    <span id="connectionStatus" class="connection-pill offline mt-2 mt-lg-0">
-                        <i class="fas fa-circle-notch fa-spin"></i> Conectando...
-                    </span>
+                    <span id="connectionStatus" class="connection-pill offline my-2 my-lg-0">Conectando...</span>
                 </div>
             </div>
         </nav>
@@ -40,13 +38,14 @@
 
     <section class="pc-page-header">
         <div class="container">
-            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
                 <div>
-                    <h1><i class="fas fa-bell me-2"></i>Alertas Climáticos e Rodada de Ligações</h1>
-                    <p>Registre alertas do INMET/Defesa Civil, gere a fila ordenada por risco e registre ligações com escalonamento automático.</p>
+                    <div class="pc-kicker">INMET · Defesa Civil · Escalonamento Automático</div>
+                    <h1>Alertas e Rodada de Ligações</h1>
+                    <p>Registre um alerta climático para gerar a fila ordenada por risco, preencher checklists e escalonar ligações sem resposta.</p>
                 </div>
-                <button type="button" class="btn btn-pc-ghost no-print" onclick="window.print()">
-                    <i class="fas fa-print me-2"></i>Imprimir Lista (Offline)
+                <button type="button" class="btn btn-paper no-print" onclick="window.print()">
+                    Imprimir lista (uso offline)
                 </button>
             </div>
         </div>
@@ -224,15 +223,14 @@
 
     <footer class="pc-footer py-4">
         <div class="container">
-            <div class="row g-3 align-items-center">
-                <div class="col-md-7">
-                    <div class="fw-bold mb-1"><i class="fas fa-temperature-high text-warning me-2"></i>Plantao Clima — CitizenTech</div>
-                    <small class="opacity-75">Escalonamento automatico: Titular nao atendeu &rarr; Reserva &rarr; CRITICO no topo do painel com orientacao 192/193/199.</small>
+            <div class="row g-2 align-items-center">
+                <div class="col-md-8">
+                    <strong class="text-dark">Plantão Clima</strong> · Escalonamento automático: Titular &rarr; Reserva &rarr; Crítico no painel (192 / 193 / 199).
                 </div>
-                <div class="col-md-5 text-md-end d-flex flex-wrap gap-2 justify-content-md-end">
-                    <span class="ods-badge ods-3">ODS 3</span>
-                    <span class="ods-badge ods-11">ODS 11</span>
-                    <span class="ods-badge ods-13">ODS 13</span>
+                <div class="col-md-4 text-md-end d-flex flex-wrap gap-1 justify-content-md-end">
+                    <span class="ods-badge">ODS 3</span>
+                    <span class="ods-badge">ODS 11</span>
+                    <span class="ods-badge">ODS 13</span>
                 </div>
             </div>
         </div>
