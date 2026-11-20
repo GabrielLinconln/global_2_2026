@@ -81,16 +81,16 @@ async function api(caminho, dados) {
   if (dados) enviando = true;
   try {
     const opcoes = dados ? { method: 'POST', body: new URLSearchParams(dados) } : {};
-    let resp;
+    let resp, json;
     try {
       resp = await fetch(API_URL + '/api/' + caminho, opcoes);
+      json = await resp.json(); // resposta sem JSON (ex.: site estático) = servidor Java fora do ar
     } catch (e) {
       marcarConexao(false);
       avisar('Servidor desligado. Inicie o sistema (App.java) e recarregue a página.', 'danger');
-      throw e;
+      throw new Error('Failed to fetch');
     }
     marcarConexao(true);
-    const json = await resp.json();
     if (!resp.ok) throw new Error(json.erro || 'Erro no servidor');
     return json;
   } finally {
