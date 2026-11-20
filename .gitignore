@@ -1,10 +1,5 @@
-build/
 data/
-*.class
+tmp/
 *.mv.db
 *.trace.db
 .DS_Store
-Thumbs.db
-.idea/
-*.iml
-.vscode/

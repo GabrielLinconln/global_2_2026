@@ -1,0 +1,73 @@
+erDiagram
+    REGIAO ||--o{ IDOSO : "tem"
+    REGIAO ||--o{ VOLUNTARIO : "tem"
+    REGIAO ||--o{ ALERTA : "recebe"
+    IDOSO ||--o{ VINCULO_CUIDADO : "e cuidado por"
+    VOLUNTARIO ||--o{ VINCULO_CUIDADO : "cuida de"
+    ALERTA ||--o{ CHECAGEM : "gera"
+    IDOSO ||--o{ CHECAGEM : "recebe"
+    VOLUNTARIO ||--o{ CHECAGEM : "faz"
+
+    REGIAO {
+        NUMBER id_regiao PK
+        VARCHAR2 nome UK "nome + cidade"
+        VARCHAR2 cidade UK
+        CHAR uf
+        NUMBER latitude
+        NUMBER longitude
+    }
+    IDOSO {
+        NUMBER id_idoso PK
+        NUMBER id_regiao FK
+        VARCHAR2 nome
+        NUMBER ano_nascimento "CHECK 1900-2100"
+        VARCHAR2 telefone "celular ou fixo obrigatorio"
+        VARCHAR2 telefone_fixo
+        VARCHAR2 endereco_ref
+        VARCHAR2 contato_familiar
+        CHAR mora_sozinho "S/N"
+        CHAR condicao_cronica "S/N"
+        CHAR sem_ventilacao "S/N"
+        CHAR mobilidade_reduzida "S/N"
+        CHAR area_risco "S/N"
+        DATE consentimento_em
+        VARCHAR2 consentido_por "PROPRIO/RESPONSAVEL"
+        CHAR ativo "S/N (exclusao logica)"
+    }
+    VOLUNTARIO {
+        NUMBER id_voluntario PK
+        NUMBER id_regiao FK
+        VARCHAR2 nome
+        VARCHAR2 telefone UK
+        VARCHAR2 tipo "VIZINHO/FAMILIAR/SINDICO/IGREJA/ACS/OUTRO"
+        CHAR ativo "S/N"
+    }
+    VINCULO_CUIDADO {
+        NUMBER id_idoso PK,FK
+        NUMBER id_voluntario PK,FK
+        VARCHAR2 papel "TITULAR/RESERVA, UK(id_idoso,papel)"
+        DATE desde
+    }
+    ALERTA {
+        NUMBER id_alerta PK
+        NUMBER id_regiao FK
+        VARCHAR2 tipo "CALOR/CHUVA"
+        DATE data_alerta "UK(regiao,data,tipo)"
+        VARCHAR2 nivel "OBSERVACAO/ATENCAO/ALERTA/MAXIMO"
+        NUMBER temp_max
+        VARCHAR2 origem "INMET/DEFESA_CIVIL/OPEN_METEO/FLOODGUARD/MANUAL"
+        VARCHAR2 fonte_aviso
+        TIMESTAMP criado_em
+    }
+    CHECAGEM {
+        NUMBER id_checagem PK
+        NUMBER id_alerta FK
+        NUMBER id_idoso FK
+        NUMBER id_voluntario FK
+        NUMBER tentativa "1 titular / 2 reserva"
+        VARCHAR2 resultado "PENDENTE/OK/ATENCAO/URGENTE/NAO_ATENDEU"
+        VARCHAR2 canal "LIGACAO/VISITA/MENSAGEM"
+        TIMESTAMP data_hora
+        VARCHAR2 observacao
+        CHAR registrado_depois "S/N"
+    }

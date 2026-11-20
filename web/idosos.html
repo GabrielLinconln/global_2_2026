@@ -1,195 +1,156 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Idosos Protegidos — Plantão Clima</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
-    <link href="css/styles.css" rel="stylesheet">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Idosos - Plantão Clima</title>
+  <link rel="stylesheet" href="lib/bootstrap.min.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-lg pc-navbar sticky-top" aria-label="Navegação principal">
-            <div class="container">
-                <a class="navbar-brand" href="index.html">
-                    <span class="brand-dot" aria-hidden="true"></span>
-                    <span>Plantão Clima</span>
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Abrir menu">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="mainNav">
-                    <ul class="navbar-nav me-auto ms-lg-4">
-                        <li class="nav-item"><a class="nav-link" href="index.html">Painel</a></li>
-                        <li class="nav-item"><a class="nav-link active" href="idosos.html">Idosos</a></li>
-                        <li class="nav-item"><a class="nav-link" href="voluntarios.html">Voluntários e Vínculos</a></li>
-                        <li class="nav-item"><a class="nav-link" href="alertas.html">Alertas e Rodada</a></li>
-                        <li class="nav-item"><a class="nav-link" href="relatorios.html">Relatórios</a></li>
-                    </ul>
-                    <span id="connectionStatus" class="connection-pill offline my-2 my-lg-0">Conectando...</span>
-                </div>
-            </div>
-        </nav>
-    </header>
+<div id="menu"></div>
+<main class="container py-3">
+  <div id="avisos"></div>
+  <h1>Idosos acompanhados</h1>
+  <p class="text-body-secondary">Pessoas de 60 anos ou mais que moram sozinhas. Só cadastre com consentimento da pessoa ou do responsável.</p>
 
-    <section class="pc-page-header">
-        <div class="container">
-            <div class="pc-kicker">Cadastro Mínimo · LGPD</div>
-            <h1>Idosos Protegidos</h1>
-            <p>Apenas ano de nascimento, consentimento registrado e fatores de vulnerabilidade para priorização automática em Calor e Chuva.</p>
+  <form id="form" class="card card-body mb-4" novalidate>
+    <h2 id="titulo" class="h5">Novo idoso</h2>
+    <input type="hidden" name="id">
+    <div class="row g-3">
+      <div class="col-12 col-md-6"><label class="form-label" for="nome">Nome *</label>
+        <input class="form-control" id="nome" name="nome" maxlength="80" autocomplete="off"></div>
+      <div class="col-6 col-md-3"><label class="form-label" for="anoNascimento">Ano de nascimento *</label>
+        <input class="form-control" id="anoNascimento" name="anoNascimento" type="number" inputmode="numeric"></div>
+      <div class="col-6 col-md-3"><label class="form-label" for="idRegiao">Região *</label>
+        <select class="form-select" id="idRegiao" name="idRegiao"></select></div>
+      <div class="col-12 col-md-6"><label class="form-label" for="telefone">Celular (DDD + número)</label>
+        <input class="form-control" id="telefone" name="telefone" inputmode="tel" placeholder="11987654321"></div>
+      <div class="col-12 col-md-6"><label class="form-label" for="telefoneFixo">Telefone fixo (DDD + número)</label>
+        <input class="form-control" id="telefoneFixo" name="telefoneFixo" inputmode="tel" placeholder="1133334444"></div>
+      <div class="col-12 col-md-2"><label class="form-label" for="cep">CEP</label>
+        <input class="form-control" id="cep" inputmode="numeric" maxlength="9" autocomplete="postal-code" aria-describedby="cepAjuda"></div>
+      <div class="col-12 col-md-4"><label class="form-label" for="enderecoRef">Endereço / referência</label>
+        <input class="form-control" id="enderecoRef" name="enderecoRef" maxlength="120">
+        <div id="cepAjuda" class="form-text" role="status">Digite o CEP: rua e bairro entram sozinhos. Complete com número e uma referência.</div></div>
+      <div class="col-12 col-md-6"><label class="form-label" for="contatoFamiliar">Contato da família (nome e telefone)</label>
+        <input class="form-control" id="contatoFamiliar" name="contatoFamiliar" maxlength="80"></div>
+      <fieldset class="col-12">
+        <legend class="form-label fs-6">Situação (define o risco no calor e na chuva)</legend>
+        <div class="d-flex flex-wrap gap-3">
+          <div class="form-check"><input class="form-check-input" type="checkbox" id="moraSozinho" name="moraSozinho" checked><label class="form-check-label" for="moraSozinho">Mora sozinho(a)</label></div>
+          <div class="form-check"><input class="form-check-input" type="checkbox" id="condicaoCronica" name="condicaoCronica"><label class="form-check-label" for="condicaoCronica">Doença crônica</label></div>
+          <div class="form-check"><input class="form-check-input" type="checkbox" id="semVentilacao" name="semVentilacao"><label class="form-check-label" for="semVentilacao">Casa sem ventilação</label></div>
+          <div class="form-check"><input class="form-check-input" type="checkbox" id="mobilidadeReduzida" name="mobilidadeReduzida"><label class="form-check-label" for="mobilidadeReduzida">Mobilidade reduzida</label></div>
+          <div class="form-check"><input class="form-check-input" type="checkbox" id="areaRisco" name="areaRisco"><label class="form-check-label" for="areaRisco">Mora em área de risco (encosta, córrego, alagamento)</label></div>
         </div>
-    </section>
+      </fieldset>
+      <div class="col-6 col-md-3"><label class="form-label" for="consentimentoEm">Consentimento em *</label>
+        <input class="form-control" id="consentimentoEm" name="consentimentoEm" type="date"></div>
+      <div class="col-6 col-md-3"><label class="form-label" for="consentidoPor">Quem consentiu *</label>
+        <select class="form-select" id="consentidoPor" name="consentidoPor">
+          <option value="PROPRIO">A própria pessoa</option><option value="RESPONSAVEL">Responsável</option></select></div>
+    </div>
+    <div class="d-flex gap-2 mt-3">
+      <button class="btn btn-primary" type="submit">Salvar</button>
+      <button class="btn btn-outline-secondary" type="button" id="cancelar">Limpar</button>
+    </div>
+  </form>
 
-    <main class="container">
-        <div id="feedbackIdosos" class="feedback-zone"></div>
+  <h2 class="h5">Cadastrados</h2>
+  <div id="lista"></div>
+</main>
 
-        <div class="row g-4">
-            <!-- Formulario CRUD -->
-            <section class="col-lg-4" aria-label="Formulario de cadastro de idoso">
-                <div class="pc-card">
-                    <div class="pc-card-header">
-                        <span id="formIdosoTitulo"><i class="fas fa-user-plus text-primary me-2"></i>Cadastrar Novo Idoso</span>
-                        <button type="button" id="btnCancelarEdicao" class="btn btn-sm btn-outline-secondary d-none">Cancelar</button>
-                    </div>
-                    <form id="formIdoso" class="p-3" novalidate>
-                        <input type="hidden" id="idosoId">
+<script src="lib/bootstrap.bundle.min.js"></script>
+<script src="app.js"></script>
+<script>
+const form = document.getElementById('form');
+let regioes = [], idosos = [];
 
-                        <div class="mb-3">
-                            <label for="nome" class="form-label fw-semibold">Nome / Como prefere ser chamado *</label>
-                            <input type="text" class="form-control" id="nome" placeholder="Ex.: Dona Rosa M." required minlength="3">
-                            <div class="invalid-feedback">Informe o nome (minimo 3 caracteres).</div>
-                        </div>
+function validar(d) {
+  limparErros(form);
+  let ok = true;
+  const ano = new Date().getFullYear();
+  if (d.nome.length < 2) ok = erroCampo(form, 'nome', 'Informe o nome (mínimo 2 letras).');
+  if (!/^\d{4}$/.test(d.anoNascimento) || d.anoNascimento < 1900 || d.anoNascimento > ano) ok = erroCampo(form, 'anoNascimento', 'Ano inválido.');
+  else if (ano - d.anoNascimento < 60) ok = erroCampo(form, 'anoNascimento', 'O Plantão Clima atende pessoas com 60 anos ou mais.');
+  if (!d.idRegiao) ok = erroCampo(form, 'idRegiao', 'Escolha a região.');
+  d.telefone = soDigitos(d.telefone);
+  d.telefoneFixo = soDigitos(d.telefoneFixo);
+  if (!d.telefone && !d.telefoneFixo) ok = erroCampo(form, 'telefone', 'Informe ao menos um telefone (celular ou fixo).');
+  if (d.telefone && !/^\d{10,11}$/.test(d.telefone)) ok = erroCampo(form, 'telefone', 'Use DDD + número (10 ou 11 dígitos).');
+  if (d.telefoneFixo && !/^\d{10}$/.test(d.telefoneFixo)) ok = erroCampo(form, 'telefoneFixo', 'Fixo: DDD + número (10 dígitos).');
+  if (!d.consentimentoEm || d.consentimentoEm > hoje()) ok = erroCampo(form, 'consentimentoEm', 'Informe a data do consentimento (não pode ser futura).');
+  return ok;
+}
 
-                        <div class="row g-2 mb-3">
-                            <div class="col-7">
-                                <label for="telefone" class="form-label fw-semibold">Telefone (fixo/celular) *</label>
-                                <input type="tel" class="form-control" id="telefone" placeholder="(11) 99999-0000" required>
-                                <div class="invalid-feedback">Informe um telefone com pelo menos 8 digitos.</div>
-                            </div>
-                            <div class="col-5">
-                                <label for="anoNascimento" class="form-label fw-semibold">Ano Nasc. *</label>
-                                <input type="number" class="form-control" id="anoNascimento" min="1900" max="1975" placeholder="1946" required>
-                                <div class="invalid-feedback">Entre 1900 e 1975.</div>
-                            </div>
-                        </div>
+async function carregar() {
+  regioes = await tentar(() => api('regioes'));
+  if (!regioes) return;
+  opcoes(document.getElementById('idRegiao'), regioes, 'id', r => `${r.nome} (${r.cidade})`, 'Escolha...');
+  idosos = await api('idosos');
+  const nomeRegiao = id => (regioes.find(r => r.id === id) || {}).nome || '';
+  document.getElementById('lista').innerHTML = idosos.length ? `<div class="table-responsive"><table class="table table-striped align-middle">
+    <thead><tr><th>Nome</th><th>Idade</th><th>Região</th><th>Telefone</th><th>Risco calor</th><th>Risco chuva</th><th>Ações</th></tr></thead><tbody>
+    ${idosos.map(i => `<tr><td>${esc(i.nome)}</td><td>${i.idade}</td><td>${esc(nomeRegiao(i.idRegiao))}</td>
+      <td>${esc([i.telefone, i.telefoneFixo].filter(Boolean).join(' / '))}</td>
+      <td>${badgeRisco(i.riscoCalor)}</td><td>${badgeRisco(i.riscoChuva)}</td>
+      <td class="text-nowrap"><button class="btn btn-sm btn-outline-primary" onclick="editar(${i.id})">Editar</button>
+        <button class="btn btn-sm btn-outline-danger" onclick="desativar(${i.id}, this)">Desativar e anonimizar</button></td></tr>`).join('')}
+    </tbody></table></div>` : '<p>Nenhum idoso cadastrado.</p>';
+}
 
-                        <div class="mb-3">
-                            <label for="idRegiao" class="form-label fw-semibold">Regiao / Territorio *</label>
-                            <select class="form-select" id="idRegiao" required>
-                                <option value="">Selecione a regiao...</option>
-                            </select>
-                            <div class="invalid-feedback">Selecione uma regiao.</div>
-                        </div>
+function limpar() {
+  form.reset();
+  form.elements.id.value = '';
+  form.elements.consentimentoEm.value = hoje();
+  document.getElementById('titulo').textContent = 'Novo idoso';
+  limparErros(form);
+}
 
-                        <div class="mb-3">
-                            <label for="enderecoResumo" class="form-label fw-semibold">Endereco Resumido (visita critica) *</label>
-                            <input type="text" class="form-control" id="enderecoResumo" placeholder="Rua, numero e complemento" required minlength="5">
-                            <div class="invalid-feedback">Informe o endereco resumido (minimo 5 caracteres).</div>
-                        </div>
+function editar(id) {
+  preencherForm(form, idosos.find(i => i.id === id));
+  document.getElementById('titulo').textContent = 'Editando idoso';
+  form.scrollIntoView({ behavior: 'smooth' });
+}
 
-                        <fieldset class="border rounded-3 p-3 mb-3 bg-light">
-                            <legend class="float-none w-auto px-2 fs-6 fw-bold text-primary">Fatores de Vulnerabilidade</legend>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="doencaCronica">
-                                <label class="form-check-label" for="doencaCronica">
-                                    <strong>Doenca cronica</strong> <span class="badge badge-calor ms-1">Peso Calor</span>
-                                </label>
-                            </div>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="casaSemVentilacao">
-                                <label class="form-check-label" for="casaSemVentilacao">
-                                    <strong>Casa sem ventilacao</strong> <span class="badge badge-calor ms-1">Peso Calor</span>
-                                </label>
-                            </div>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="areaRisco">
-                                <label class="form-check-label" for="areaRisco">
-                                    <strong>Casa em area de risco</strong> <span class="badge badge-chuva ms-1">Peso Chuva</span>
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="mobilidadeReduzida">
-                                <label class="form-check-label" for="mobilidadeReduzida">
-                                    <strong>Mobilidade reduzida</strong> <span class="badge badge-chuva ms-1">Peso Chuva</span>
-                                </label>
-                            </div>
-                        </fieldset>
+// dois cliques para confirmar (sem confirm() do navegador)
+async function desativar(id, botao) {
+  if (botao.dataset.confirmar !== 'sim') {
+    botao.dataset.confirmar = 'sim';
+    botao.textContent = 'Clique de novo para confirmar';
+    return;
+  }
+  if (await tentar(() => api('idosos/excluir', { id }), 'Idoso desativado. Nome, telefones, endereço e saúde foram apagados (LGPD).') !== undefined) carregar();
+}
 
-                        <div class="mb-3">
-                            <label for="observacoes" class="form-label fw-semibold">Observacoes de cuidado</label>
-                            <textarea class="form-control" id="observacoes" rows="2" placeholder="Ex.: Usa aparelho auditivo, prefere ligacoes pela manha..."></textarea>
-                        </div>
-
-                        <div class="form-check p-3 rounded-3 bg-primary-subtle border border-primary-subtle mb-3">
-                            <input class="form-check-input ms-0 me-2" type="checkbox" id="consentimentoLgpd" required>
-                            <label class="form-check-label small" for="consentimentoLgpd">
-                                <strong>Consentimento LGPD *:</strong> Confirmo que o idoso autorizou participar da rede comunitaria e receber ligacoes em alertas climaticos (apenas dados minimos armazenados).
-                            </label>
-                            <div class="invalid-feedback">O consentimento registrado e obrigatorio.</div>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary w-100 fw-bold py-2">
-                            <i class="fas fa-floppy-disk me-2"></i><span id="btnSalvarTexto">Salvar Idoso</span>
-                        </button>
-                    </form>
-                </div>
-            </section>
-
-            <!-- Listagem e Filtros -->
-            <section class="col-lg-8" aria-label="Lista de idosos cadastrados">
-                <div class="pc-card">
-                    <div class="pc-card-header">
-                        <span><i class="fas fa-list me-2 text-primary"></i>Idosos Cadastrados (<span id="totalIdososLista">0</span>)</span>
-                        <div class="d-flex flex-wrap gap-2">
-                            <input type="search" id="filtroBusca" class="form-control form-control-sm" style="width: 190px;" placeholder="Buscar por nome ou rua...">
-                            <select id="filtroRegiao" class="form-select form-select-sm" style="width: 170px;">
-                                <option value="">Todas as regioes</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Idoso / Contato</th>
-                                    <th>Regiao &amp; Fatores</th>
-                                    <th class="text-center">Risco Calor</th>
-                                    <th class="text-center">Risco Chuva</th>
-                                    <th class="text-end">Acoes</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabelaIdosos">
-                                <tr><td colspan="5" class="text-center py-4 text-muted">Carregando...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-        </div>
-    </main>
-
-    <footer class="pc-footer py-4">
-        <div class="container">
-            <div class="row g-2 align-items-center">
-                <div class="col-md-8">
-                    <strong class="text-dark">Plantão Clima</strong> · Privacidade por padrão: apenas ano de nascimento e consentimento registrado.
-                </div>
-                <div class="col-md-4 text-md-end d-flex flex-wrap gap-1 justify-content-md-end">
-                    <span class="ods-badge">ODS 3</span>
-                    <span class="ods-badge">ODS 11</span>
-                    <span class="ods-badge">ODS 13</span>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/api.js"></script>
-    <script src="js/motion.js"></script>
-    <script src="js/idosos.js"></script>
+form.addEventListener('submit', async e => {
+  e.preventDefault();
+  const d = dadosForm(form);
+  if (!validar(d)) return;
+  const r = await tentar(() => api('idosos', d), d.id ? 'Idoso atualizado.' : 'Idoso cadastrado.');
+  if (r) { limpar(); carregar(); }
+});
+document.getElementById('cancelar').addEventListener('click', limpar);
+limpar();
+carregar();
+// CEP pela BrasilAPI (publica, sem chave): preenche rua e bairro; o CEP nao e gravado
+document.getElementById('cep').addEventListener('input', async e => {
+  const cep = soDigitos(e.target.value), ajuda = document.getElementById('cepAjuda');
+  if (cep.length !== 8) return;
+  ajuda.textContent = 'Buscando o CEP';
+  try {
+    const r = await fetch('https://brasilapi.com.br/api/cep/v2/' + cep);
+    if (!r.ok) throw new Error();
+    const c = await r.json();
+    const end = document.getElementById('enderecoRef');
+    end.value = [c.street, c.neighborhood].filter(Boolean).join(', ') + ', ';
+    end.focus();
+    ajuda.textContent = `Achado: ${c.city}/${c.state}. Complete com número e uma referência.`;
+  } catch (err) {
+    ajuda.textContent = 'CEP não encontrado ou sem internet. Digite o endereço.';
+  }
+});
+</script>
 </body>
 </html>

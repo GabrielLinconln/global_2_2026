@@ -1,0 +1,193 @@
+classDiagram
+    direction TB
+    class Pessoa {
+        <<abstract>>
+        -Long id
+        -String nome
+        -String telefone
+        -boolean ativo
+        +validar()* void
+        #validarNome() void
+        #telefoneValido(String)$ boolean
+    }
+    class Idoso {
+        -long idRegiao
+        -int anoNascimento
+        -String telefoneFixo
+        -String enderecoRef
+        -String contatoFamiliar
+        -boolean moraSozinho
+        -boolean condicaoCronica
+        -boolean semVentilacao
+        -boolean mobilidadeReduzida
+        -boolean areaRisco
+        -LocalDate consentimentoEm
+        -String consentidoPor
+        +getIdade() int
+        +calcularRisco(TipoAlerta) Risco
+        +validar() void
+    }
+    class Voluntario {
+        -long idRegiao
+        -String tipo
+        +validar() void
+    }
+    class Regiao {
+        -Long id
+        -String nome
+        -String cidade
+        -String uf
+        -Double latitude
+        -Double longitude
+        +validar() void
+    }
+    class Vinculo {
+        -long idIdoso
+        -long idVoluntario
+        -String papel
+        -LocalDate desde
+        +validar() void
+    }
+    class Alerta {
+        -Long id
+        -long idRegiao
+        -TipoAlerta tipo
+        -LocalDate dataAlerta
+        -String nivel
+        -Double tempMax
+        -String origem
+        -String fonteAviso
+        +validar() void
+    }
+    class Checagem {
+        -Long id
+        -long idAlerta
+        -long idIdoso
+        -long idVoluntario
+        -int tentativa
+        -Resultado resultado
+        -String canal
+        -LocalDateTime dataHora
+        -String observacao
+        -boolean registradoDepois
+    }
+    class TipoAlerta {
+        <<enumeration>>
+        CALOR
+        CHUVA
+    }
+    class Risco {
+        <<enumeration>>
+        ALTO
+        MEDIO
+        BAIXO
+    }
+    class Resultado {
+        <<enumeration>>
+        PENDENTE
+        OK
+        ATENCAO
+        URGENTE
+        NAO_ATENDEU
+        +houveContato() boolean
+    }
+    class AvaliavelRisco {
+        <<interface>>
+        +calcularRisco(TipoAlerta) Risco
+    }
+    class Dao~T~ {
+        <<interface>>
+        +inserir(T) T
+        +buscarPorId(long) T
+        +listar() List~T~
+        +atualizar(T) void
+        +excluir(long) void
+    }
+    class IdosoDao {
+        +excluir(long) void
+        +montar(ResultSet)$ Idoso
+    }
+    class VoluntarioDao
+    class RegiaoDao
+    class AlertaDao
+    class VinculoDao {
+        +inserir(Vinculo) void
+        +atualizarPapel(Vinculo) void
+        +listar() List
+        +excluir(long, long) void
+        +voluntarioNoPapel(Connection, long, String) Long
+    }
+    class ChecagemDao {
+        +criarRodada(Connection, long, long) int
+        +criarTentativaReserva(Connection, long, long, long) int
+        +registrar(Connection, Checagem) void
+        +listarCriticos(long) List
+    }
+    class RelatorioDao {
+        +coberturaPorRegiao(LocalDate) List
+        +furosNaRede() List
+        +cargaVoluntarios() List
+    }
+    class ConnectionFactory {
+        +getConnection()$ Connection
+        +inicializar()$ void
+    }
+    class AlertaService {
+        +gerarRodada(long) int
+        +listarRodada(long) List~Checagem~
+        +painel(Long) Map
+        +leituraSensor(long, int) Map
+        +alertaDoDia(long, TipoAlerta, String, String, String) Alerta
+    }
+    class InmetService {
+        +importar() Map
+        +importar(String) Map
+        +ultimaConsulta()$ Map
+        +lerAvisos(String)$ List
+        +atinge(String, String, String)$ boolean
+        +tipo(String)$ TipoAlerta
+        +nivel(String)$ String
+    }
+    class ChecagemService {
+        +registrar(long, String, String, String, boolean) String
+    }
+    class PrevisaoService {
+        +sugerir(Regiao, LocalDate) Map
+        +nivelPelaRegua(double)$ String
+        ~baixar(String, String, String)$ String
+    }
+    class Servidor {
+        +iniciar(int) void
+    }
+    class RegraNegocioException
+    class RecursoNaoEncontradoException
+    class PersistenciaException
+    class RuntimeException
+
+    Pessoa <|-- Idoso
+    Pessoa <|-- Voluntario
+    Dao <|.. IdosoDao
+    Dao <|.. VoluntarioDao
+    Dao <|.. RegiaoDao
+    Dao <|.. AlertaDao
+    RuntimeException <|-- RegraNegocioException
+    RuntimeException <|-- PersistenciaException
+    RegraNegocioException <|-- RecursoNaoEncontradoException
+    AvaliavelRisco <|.. Idoso
+    Alerta --> TipoAlerta
+    Checagem --> Resultado
+    Checagem --> Idoso
+    Idoso ..> Risco : calcula
+    Servidor --> AlertaService
+    Servidor --> ChecagemService
+    Servidor --> PrevisaoService
+    Servidor --> InmetService
+    InmetService --> AlertaService
+    InmetService ..> PrevisaoService : baixar
+    Servidor --> Dao
+    AlertaService --> ChecagemDao
+    AlertaService --> AlertaDao
+    ChecagemService --> ChecagemDao
+    ChecagemService --> VinculoDao
+    IdosoDao ..> ConnectionFactory
+    ChecagemDao ..> ConnectionFactory

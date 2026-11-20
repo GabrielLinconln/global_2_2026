@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Como funciona - Plantão Clima</title>
+  <link rel="preload" href="lib/fonts/atkinson-next.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="lib/bootstrap.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="menu"></div>
+
+<section class="faixa abertura no-print" aria-labelledby="titulo">
+  <div class="container">
+    <div id="avisos"></div>
+    <h1 id="titulo">No dia de calor extremo ou de chuva forte, nenhum idoso fica sem uma ligação.</h1>
+    <p class="lead">O idoso não instala nada: só atende o telefone, celular ou fixo. Quem liga é um vizinho que ele já conhece.
+      O sistema decide quem ligar, em que ordem, e avisa quando ninguém atendeu.</p>
+  </div>
+</section>
+
+<main class="container pb-5">
+  <section class="placar no-print" aria-labelledby="tRisco">
+    <h2 id="tRisco">O risco é conhecido: quem mora sozinho morre mais</h2>
+    <p class="medida">Na onda de calor de Chicago em 1995, mais de 700 pessoas morreram em uma semana. O estudo que comparou quem morreu
+      com quem sobreviveu achou o padrão que se repete até hoje: o perigo maior é ficar sem ninguém perguntando como você está.<a class="ref" href="#f1">1</a></p>
+    <figure class="risco" aria-labelledby="cRisco">
+      <div class="risco-linha"><span>Não sair de casa todo dia</span><div class="risco-trilho"><b style="width:100%"></b></div><strong>6,7×</strong></div>
+      <div class="risco-linha"><span>Morar no último andar</span><div class="risco-trilho"><b style="width:70%"></b></div><strong>4,7×</strong></div>
+      <div class="risco-linha"><span>Morar sozinho</span><div class="risco-trilho"><b style="width:34%"></b></div><strong>2,3×</strong></div>
+      <div class="risco-linha base"><span>Ter contato diário com alguém</span><div class="risco-trilho"><b style="width:15%"></b></div><strong>1×</strong></div>
+      <figcaption id="cRisco">Quantas vezes maior foi o risco de morrer no calor. Chicago, 1995 (Semenza e colegas, New England Journal of Medicine, 1996).
+        Ter amigos por perto e atividades em grupo protegeu.</figcaption>
+    </figure>
+    <div class="row g-4 numeros">
+      <div class="col-12 col-md-4"><p><strong>48 mil</strong> mortes ligadas a ondas de calor em 14 regiões metropolitanas do Brasil, de 2000 a 2018.
+        Cerca de 20 vezes mais que as mortes por deslizamentos. Idosos foram o grupo mais atingido.<a class="ref" href="#f2">2</a></p></div>
+      <div class="col-12 col-md-4"><p><strong>5,6 milhões</strong> de pessoas com 60 anos ou mais moram sozinhas no Brasil.<a class="ref" href="#f3">3</a></p></div>
+      <div class="col-12 col-md-4"><p><strong>1 em cada 3</strong> idosos não usa internet. Por isso o Plantão chega por ligação, não por aplicativo.<a class="ref" href="#f4">4</a></p></div>
+    </div>
+  </section>
+
+  <section class="mt-5 no-print" aria-labelledby="tPapeis">
+    <div class="secao-titulo"><h2 id="tPapeis">Quem faz o quê</h2></div>
+    <p>Cada pessoa faz uma coisa só, e nada além do que já faria num dia de alerta.</p>
+    <div class="row g-4 papeis">
+      <div class="col-12 col-md-4">
+        <h3>Idoso</h3>
+        <p>Atende a ligação e diz como está. Não precisa de aplicativo, internet nem smartphone. A família recebe notícia pelo WhatsApp.</p>
+      </div>
+      <div class="col-12 col-md-4">
+        <h3>Vizinho voluntário</h3>
+        <p>Recebe a lista dele, de 3 a 5 pessoas, com o botão de ligar. Depois de cada ligação, aperta uma de quatro respostas. Dá uns 2 minutos por pessoa.
+          Sem internet, imprime a lista e lança depois.</p>
+      </div>
+      <div class="col-12 col-md-4">
+        <h3>Coordenação local</h3>
+        <p>UBS, CRAS, igreja ou síndico cadastra os idosos uma vez, com consentimento. No dia do alerta só acompanha o painel e manda alguém
+          até a casa de quem ninguém conseguiu falar.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="mt-5 no-print" aria-labelledby="tFluxo">
+    <div class="secao-titulo"><h2 id="tFluxo">Do aviso à porta de casa</h2></div>
+    <ol class="protocolo fluxo">
+      <li class="ativo"><strong>O aviso chega</strong><span>O aviso oficial do Inmet entra sozinho, consultado a cada 30 minutos. Também pode vir da Defesa Civil, da previsão de calor do Open-Meteo ou do sensor FloodGuard do córrego passando de 70% da cota.</span></li>
+      <li class="ativo"><strong>A rodada sai sozinha</strong><span>Uma ligação para cada idoso da região, quem tem mais risco primeiro.</span></li>
+      <li class="ativo"><strong>Titular liga, reserva cobre</strong><span>Se o titular não consegue falar, a ligação passa para o reserva.</span></li>
+      <li class="ativo perigo"><strong>Ninguém atendeu: alguém vai até lá</strong><span>O caso vira crítico no topo do painel, com 192, 193 e 199 a um toque.</span></li>
+    </ol>
+  </section>
+
+  <section class="mt-5 no-print" aria-labelledby="tAntes">
+    <div class="secao-titulo"><h2 id="tAntes">O que muda no dia do alerta</h2></div>
+    <div class="row g-3 antes-depois">
+      <div class="col-12 col-md-6"><div class="lado sem">
+        <h3>Sem o Plantão</h3>
+        <ul>
+          <li>O alerta chega por SMS a quem tem celular e lê mensagem.</li>
+          <li>Cada família liga se lembrar, e ninguém sabe quem ficou sem ligação.</li>
+          <li>Quem mora sozinho e não atende só é procurado dias depois.</li>
+        </ul></div></div>
+      <div class="col-12 col-md-6"><div class="lado com">
+        <h3>Com o Plantão</h3>
+        <ul>
+          <li>O alerta vira uma lista de ligações em minutos, sem digitação.</li>
+          <li>O painel mostra quem já deu notícia e quem falta, em tempo real.</li>
+          <li>Quem não atende vai para o reserva e, depois, para uma visita no mesmo dia.</li>
+        </ul></div></div>
+    </div>
+  </section>
+
+  <section class="mt-5 no-print" aria-labelledby="tJa">
+    <div class="secao-titulo"><h2 id="tJa">Quem já faz isso, e o que aprendemos</h2></div>
+    <ol class="linha-tempo">
+      <li><span class="ano">1995</span><div><strong>Chicago, Estados Unidos</strong>
+        <p>A onda de calor mostra que o isolamento mata. Na onda seguinte, em 1999, um novo estudo confirmou: morar sozinho foi o maior fator de risco de morte.<a class="ref" href="#f1">1</a></p></div></li>
+      <li><span class="ano">2004</span><div><strong>França</strong>
+        <p>Depois de cerca de 15 mil mortes na canícula de 2003, uma lei manda cada prefeitura manter um registro de idosos isolados e ligar para eles
+          quando sai o alerta. A lição: os mais isolados raramente se inscrevem sozinhos.<a class="ref" href="#f5">5</a></p></div></li>
+      <li><span class="ano">2024</span><div><strong>Rio Grande do Sul</strong>
+        <p>Nas enchentes, 1 em cada 5 moradores das áreas atingidas tinha 60 anos ou mais. O alerta da Defesa Civil existe, mas não bate na porta.<a class="ref" href="#f6">6</a></p></div></li>
+      <li class="agora"><span class="ano">Agora</span><div><strong>Plantão Clima</strong>
+        <p>Junta o que funcionou: a ligação da França, a rede de vizinhos que protegeu em Chicago e o alerta oficial brasileiro.
+          E corrige a falha do registro: quem cadastra é o agente de saúde ou o vizinho, não o idoso.</p></div></li>
+    </ol>
+  </section>
+
+  <section class="mt-5 no-print" aria-labelledby="tEscala">
+    <div class="secao-titulo"><h2 id="tEscala">Como chegar a quem precisa</h2></div>
+    <p class="medida">Cerca de 5,6 milhões de pessoas com 60 anos ou mais moram sozinhas no Brasil (Censo 2022). Ninguém precisa baixar nada:
+      a divulgação usa redes que já visitam, já conhecem e já são de confiança dessas pessoas.</p>
+    <div class="row g-3 canais">
+      <div class="col-12 col-md-6 col-lg-4"><div class="canal"><h3>Agentes comunitários de saúde</h3>
+        <p>Já visitam os idosos em casa todo mês. Na visita, pedem o consentimento e cadastram. A UBS vira a coordenação do bairro.</p></div></div>
+      <div class="col-12 col-md-6 col-lg-4"><div class="canal"><h3>CRAS e assistência social</h3>
+        <p>Já acompanham quem mora sozinho e tem renda baixa: é a lista de partida para o cadastro.</p></div></div>
+      <div class="col-12 col-md-6 col-lg-4"><div class="canal"><h3>Igrejas e associações</h3>
+        <p>De onde vem o voluntário: o aviso no fim do culto ou da reunião, com o cartaz desta página.</p></div></div>
+      <div class="col-12 col-md-6 col-lg-4"><div class="canal"><h3>Síndicos e zeladores</h3>
+        <p>Um prédio já é uma rede pronta. O síndico vira titular dos moradores idosos e o zelador, reserva.</p></div></div>
+      <div class="col-12 col-md-6 col-lg-4"><div class="canal"><h3>Defesa Civil</h3>
+        <p>O aviso do SMS 40199 já chega ao celular do voluntário. O Plantão transforma esse aviso numa ligação para quem não lê SMS.</p></div></div>
+      <div class="col-12 col-md-6 col-lg-4"><div class="canal"><h3>Família de longe</h3>
+        <p>Recebe a notícia pelo WhatsApp e indica vizinhos de confiança. Quem cuida à distância vira divulgador.</p></div></div>
+    </div>
+  </section>
+
+  <section class="mt-5 no-print" aria-labelledby="tFases">
+    <div class="secao-titulo"><h2 id="tFases">Em três passos, do bairro ao país</h2></div>
+    <ol class="protocolo fases">
+      <li class="ativo"><strong>Piloto num bairro</strong><span>1 UBS, 1 igreja e 2 prédios, cerca de 50 idosos, num verão. Meta: todos com notícia em até 2 horas depois do aviso.</span></li>
+      <li class="ativo"><strong>A cidade adota</strong><span>Secretaria de Saúde e Defesa Civil assumem a coordenação. O aviso oficial e o sensor FloodGuard entram direto, sem digitação.</span></li>
+      <li class="ativo"><strong>Rede nacional</strong><span>Código aberto e servidor simples: cada município roda o seu, com as equipes de saúde da família que já existem.</span></li>
+    </ol>
+    <p class="medida mt-3">Por que vale a pena: custa um servidor e o tempo de vizinhos que já se ajudariam. Os relatórios mostram onde a rede tem furo
+      (idoso sem reserva, voluntário sobrecarregado) antes do próximo alerta, não depois.</p>
+  </section>
+
+  <section class="mt-5 no-print" aria-labelledby="tPerg">
+    <div class="secao-titulo"><h2 id="tPerg">Perguntas que sempre aparecem</h2></div>
+    <div class="perguntas">
+      <details><summary>Por que não um aplicativo para o idoso?</summary>
+        <p>Porque 1 em cada 3 idosos não usa internet, e quem mais corre risco é justamente quem está mais isolado. O idoso só atende o telefone, celular ou fixo. Quem usa o sistema é o voluntário.</p></details>
+      <details><summary>A Defesa Civil já manda alerta. O que o Plantão acrescenta?</summary>
+        <p>O alerta avisa. O Plantão garante que alguém ligou, sabe como cada idoso está e manda alguém até a casa de quem não atendeu. É o último passo, que hoje ninguém registra.</p></details>
+      <details><summary>E se o voluntário não ligar ou não conseguir falar?</summary>
+        <p>Cada idoso tem titular e reserva. Sem resposta, a ligação passa para o reserva. Se ninguém atender, o caso vai para o topo do painel como crítico, com 192, 193 e 199 a um toque.</p></details>
+      <details><summary>Como fica a privacidade dos dados?</summary>
+        <p>O cadastro é feito com consentimento. Os relatórios para UBS e Defesa Civil mostram só números, sem nomes. Quando alguém sai do programa, os dados pessoais são anonimizados, como pede a LGPD.</p></details>
+      <details><summary>Quanto custa para uma cidade?</summary>
+        <p>Um servidor simples e o tempo de pessoas que já se ajudariam. As equipes de saúde da família e os CRAS já existem e já conhecem os idosos.</p></details>
+      <details><summary>Como sabemos se está funcionando?</summary>
+        <p>Pelos relatórios: quantos idosos deram notícia em até 4 horas do alerta, onde falta reserva e quais voluntários estão sobrecarregados. A meta do piloto é 100% com notícia em até 2 horas.</p></details>
+    </div>
+  </section>
+
+  <section class="mt-5" aria-labelledby="tCartaz">
+    <div class="secao-titulo no-print">
+      <h2 id="tCartaz">Cartaz para recrutar vizinhos</h2>
+      <button class="btn btn-primary" onclick="window.print()">Imprimir cartaz</button>
+    </div>
+    <article class="cartaz">
+      <div class="cartaz-sol" aria-hidden="true"></div>
+      <h2>Tem um vizinho idoso que mora sozinho?</h2>
+      <p class="cartaz-sub">Nos dias de calor extremo ou chuva forte, uma ligação sua pode salvar uma vida.</p>
+      <ul>
+        <li>Você liga para 3 a 5 vizinhos idosos quando sair um alerta.</li>
+        <li>Leva uns 2 minutos por ligação. O sistema diz quem ligar e em que ordem.</li>
+        <li>Se ninguém atender, outra pessoa tenta e, se preciso, alguém vai até a casa.</li>
+      </ul>
+      <p class="cartaz-cta">Seja vizinho de plantão. Procure a coordenação do Plantão Clima na UBS, na igreja ou com o síndico.</p>
+      <p class="cartaz-rodape">Plantão Clima. Em emergência: 192 (SAMU), 193 (Bombeiros), 199 (Defesa Civil).</p>
+    </article>
+  </section>
+
+  <section class="mt-5 no-print fontes" aria-labelledby="tFontes">
+    <h2 id="tFontes" class="h5">Fontes</h2>
+    <ol>
+      <li id="f1">Semenza J. C. et al. <a href="https://pubmed.ncbi.nlm.nih.gov/8649494/">Heat-related deaths during the July 1995 heat wave in Chicago</a>. New England Journal of Medicine, 1996. Mortes: <a href="https://www.cdc.gov/mmwr/preview/mmwrhtml/00053616.htm">CDC, MMWR</a>. Onda de 1999: Naughton M. P. et al., <a href="https://pubmed.ncbi.nlm.nih.gov/11988377">American Journal of Preventive Medicine</a>, 2002.</li>
+      <li id="f2">Monteiro dos Santos D. et al. (UFRJ). Ondas de calor e mortalidade no Brasil urbano, PLOS ONE, 2024. Resumo em <a href="https://www.ihu.unisinos.br/categorias/636294-48-mil-morreram-por-ondas-de-calor-no-brasil-entre-2000-e-2018">IHU Unisinos</a> e <a href="https://www.correiobraziliense.com.br/mundo/2024/01/6792127-calor-matou-mais-que-deslizamentos-de-terra-no-brasil-aponta-estudo.html">Correio Braziliense</a>.</li>
+      <li id="f3">IBGE, Censo 2022: arranjos domiciliares. <a href="https://agenciagov.ebc.com.br/noticias/202511/censo-2022-pela-primeira-vez-menos-da-metade-das-familias-do-pais-sao-formadas-por-casais-com-filhos">Agência Gov</a>.</li>
+      <li id="f4">Cetic.br, <a href="https://cetic.br/pt/tics/domicilios/2024/individuos/C1/">TIC Domicílios 2024</a>, usuários de internet por faixa etária.</li>
+      <li id="f5">Registro de pessoas vulneráveis da lei de 30 de junho de 2004: <a href="https://www.lyon.fr/demarche/personnes-agees/inscription-sur-le-fichier-canicule">Prefeitura de Lyon</a>. Avaliação dos registros: <a href="https://santepubliquefrance.fr/content/download/222469/2471591?version=1">Santé publique France</a>.</li>
+      <li id="f6">IBGE, <a href="https://agenciadenoticias.ibge.gov.br/pt/agencia-noticias/47396-divulgacao-peers.html">pesquisa sobre as enchentes no RS (PEERS)</a>.</li>
+    </ol>
+  </section>
+</main>
+
+<script src="lib/bootstrap.bundle.min.js"></script>
+<script src="app.js"></script>
+<script>tentar(() => api('regioes'));</script>
+</body>
+</html>

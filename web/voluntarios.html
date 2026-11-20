@@ -1,222 +1,162 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voluntários e Vínculos — Plantão Clima</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
-    <link href="css/styles.css" rel="stylesheet">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Voluntários e vínculos - Plantão Clima</title>
+  <link rel="stylesheet" href="lib/bootstrap.min.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-lg pc-navbar sticky-top" aria-label="Navegação principal">
-            <div class="container">
-                <a class="navbar-brand" href="index.html">
-                    <span class="brand-dot" aria-hidden="true"></span>
-                    <span>Plantão Clima</span>
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Abrir menu">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="mainNav">
-                    <ul class="navbar-nav me-auto ms-lg-4">
-                        <li class="nav-item"><a class="nav-link" href="index.html">Painel</a></li>
-                        <li class="nav-item"><a class="nav-link" href="idosos.html">Idosos</a></li>
-                        <li class="nav-item"><a class="nav-link active" href="voluntarios.html">Voluntários e Vínculos</a></li>
-                        <li class="nav-item"><a class="nav-link" href="alertas.html">Alertas e Rodada</a></li>
-                        <li class="nav-item"><a class="nav-link" href="relatorios.html">Relatórios</a></li>
-                    </ul>
-                    <span id="connectionStatus" class="connection-pill offline my-2 my-lg-0">Conectando...</span>
-                </div>
-            </div>
-        </nav>
-    </header>
+<div id="menu"></div>
+<main class="container py-3">
+  <div id="avisos"></div>
+  <h1>Voluntários e vínculos</h1>
+  <p class="text-body-secondary">Voluntários são pessoas que o idoso já conhece. Cada idoso precisa de um titular e um reserva.</p>
 
-    <section class="pc-page-header">
-        <div class="container">
-            <div class="pc-kicker">Rede de Confiança · Relação N:N</div>
-            <h1>Voluntários e Vínculos de Cuidado</h1>
-            <p>Gerencie vizinhos, familiares, síndicos ou agentes de saúde e defina a dupla Titular e Reserva de cada idoso.</p>
+  <div id="furos"></div>
+
+  <div class="row g-4">
+    <section class="col-12 col-lg-6">
+      <form id="formVol" class="card card-body" novalidate>
+        <h2 id="tituloVol" class="h5">Novo voluntário</h2>
+        <input type="hidden" name="id">
+        <div class="row g-3">
+          <div class="col-12"><label class="form-label" for="nome">Nome *</label>
+            <input class="form-control" id="nome" name="nome" maxlength="80" autocomplete="off"></div>
+          <div class="col-12 col-md-6"><label class="form-label" for="telefone">Celular (DDD + número) *</label>
+            <input class="form-control" id="telefone" name="telefone" inputmode="tel" placeholder="11987654321"></div>
+          <div class="col-6 col-md-3"><label class="form-label" for="tipo">Quem é *</label>
+            <select class="form-select" id="tipo" name="tipo">
+              <option value="VIZINHO">Vizinho</option><option value="FAMILIAR">Familiar</option><option value="SINDICO">Síndico</option>
+              <option value="IGREJA">Igreja</option><option value="ACS">Agente de saúde</option><option value="OUTRO">Outro</option></select></div>
+          <div class="col-6 col-md-3"><label class="form-label" for="idRegiaoVol">Região *</label>
+            <select class="form-select" id="idRegiaoVol" name="idRegiao"></select></div>
         </div>
+        <div class="d-flex gap-2 mt-3">
+          <button class="btn btn-primary" type="submit">Salvar</button>
+          <button class="btn btn-outline-secondary" type="button" id="limparVol">Limpar</button>
+        </div>
+      </form>
+      <h2 class="h5 mt-4">Voluntários</h2>
+      <div id="listaVol"></div>
     </section>
 
-    <main class="container">
-        <div id="feedbackVoluntarios" class="feedback-zone"></div>
-
-        <!-- Secao 1: Vinculos de Cuidado (N:N) -->
-        <section class="row g-4 mb-4" aria-label="Vinculos de cuidado entre idosos e voluntarios">
-            <div class="col-lg-4">
-                <div class="pc-card h-100">
-                    <div class="pc-card-header">
-                        <span><i class="fas fa-link text-primary me-2"></i>Criar Vinculo de Cuidado</span>
-                    </div>
-                    <form id="formVinculo" class="p-3" novalidate>
-                        <div class="mb-3">
-                            <label for="vincIdoso" class="form-label fw-semibold">Idoso *</label>
-                            <select class="form-select" id="vincIdoso" required>
-                                <option value="">Selecione o idoso...</option>
-                            </select>
-                            <div class="invalid-feedback">Selecione um idoso.</div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="vincVoluntario" class="form-label fw-semibold">Voluntario de Confianca *</label>
-                            <select class="form-select" id="vincVoluntario" required>
-                                <option value="">Selecione o voluntario...</option>
-                            </select>
-                            <div class="invalid-feedback">Selecione um voluntario.</div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="vincPapel" class="form-label fw-semibold">Papel na Rede *</label>
-                            <select class="form-select" id="vincPapel" required>
-                                <option value="TITULAR">TITULAR (1a ligacao - prioridade 1)</option>
-                                <option value="RESERVA">RESERVA (backup automatico - prioridade 2)</option>
-                            </select>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary w-100 fw-bold">
-                            <i class="fas fa-plus-circle me-2"></i>Vincular Voluntario
-                        </button>
-                        <small class="d-block text-muted mt-2">
-                            Regra do banco (UNIQUE): cada idoso tem 1 Titular e 1 Reserva distintos.
-                        </small>
-                    </form>
-                </div>
-            </div>
-
-            <div class="col-lg-8">
-                <div class="pc-card h-100">
-                    <div class="pc-card-header">
-                        <span><i class="fas fa-diagram-project text-primary me-2"></i>Rede de Protecao por Idoso (Titular + Reserva)</span>
-                        <span class="badge bg-info-subtle text-info">Tabela associativa VINCULO_CUIDADO</span>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Idoso</th>
-                                    <th>Voluntario Titular (1o)</th>
-                                    <th>Voluntario Reserva (2o)</th>
-                                    <th>Cobertura</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabelaRedeIdosos">
-                                <tr><td colspan="4" class="text-center py-4 text-muted">Carregando rede...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Secao 2: CRUD de Voluntarios -->
-        <section class="row g-4" aria-label="Cadastro e lista de voluntarios">
-            <div class="col-lg-4">
-                <div class="pc-card">
-                    <div class="pc-card-header">
-                        <span id="formVolTitulo"><i class="fas fa-user-plus text-success me-2"></i>Cadastrar Voluntario</span>
-                        <button type="button" id="btnCancelarVol" class="btn btn-sm btn-outline-secondary d-none">Cancelar</button>
-                    </div>
-                    <form id="formVoluntario" class="p-3" novalidate>
-                        <input type="hidden" id="volId">
-
-                        <div class="mb-3">
-                            <label for="volNome" class="form-label fw-semibold">Nome completo *</label>
-                            <input type="text" class="form-control" id="volNome" required minlength="3" placeholder="Ex.: Ana Paula Costa">
-                            <div class="invalid-feedback">Informe o nome (minimo 3 caracteres).</div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="volTelefone" class="form-label fw-semibold">Telefone / WhatsApp *</label>
-                            <input type="tel" class="form-control" id="volTelefone" required placeholder="(11) 98888-7777">
-                            <div class="invalid-feedback">Informe um telefone valido (unico).</div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="volRelacao" class="form-label fw-semibold">Vinculo com a comunidade *</label>
-                            <select class="form-select" id="volRelacao" required>
-                                <option value="Vizinho(a)">Vizinho(a)</option>
-                                <option value="Familiar">Familiar</option>
-                                <option value="Sindico / Condominio">Sindico / Condominio</option>
-                                <option value="Igreja / Grupo Comunitario">Igreja / Grupo Comunitario</option>
-                                <option value="Associacao de Bairro">Associacao de Bairro</option>
-                                <option value="Agente de Saude">Agente de Saude</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="volDisponibilidade" class="form-label fw-semibold">Disponibilidade *</label>
-                            <select class="form-select" id="volDisponibilidade" required>
-                                <option value="Integral">Integral</option>
-                                <option value="Manha e Tarde">Manha e Tarde</option>
-                                <option value="Tarde e Noite">Tarde e Noite</option>
-                                <option value="Noite e Fins de Semana">Noite e Fins de Semana</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="volRegiao" class="form-label fw-semibold">Regiao de atuacao *</label>
-                            <select class="form-select" id="volRegiao" required>
-                                <option value="">Selecione...</option>
-                            </select>
-                            <div class="invalid-feedback">Selecione a regiao.</div>
-                        </div>
-
-                        <button type="submit" class="btn btn-success w-100 fw-bold">
-                            <i class="fas fa-floppy-disk me-2"></i><span id="btnVolTexto">Salvar Voluntario</span>
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            <div class="col-lg-8">
-                <div class="pc-card">
-                    <div class="pc-card-header">
-                        <span><i class="fas fa-users text-success me-2"></i>Voluntarios Cadastrados (<span id="totalVolLista">0</span>)</span>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Voluntario</th>
-                                    <th>Relacao &amp; Disponibilidade</th>
-                                    <th>Regiao</th>
-                                    <th class="text-end">Acoes</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabelaVoluntarios">
-                                <tr><td colspan="4" class="text-center py-4 text-muted">Carregando...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer class="pc-footer py-4">
-        <div class="container">
-            <div class="row g-2 align-items-center">
-                <div class="col-md-8">
-                    <strong class="text-dark">Plantão Clima</strong> · Quem liga é alguém que o idoso já conhece: vizinho, familiar, síndico ou agente de saúde.
-                </div>
-                <div class="col-md-4 text-md-end d-flex flex-wrap gap-1 justify-content-md-end">
-                    <span class="ods-badge">ODS 3</span>
-                    <span class="ods-badge">ODS 11</span>
-                    <span class="ods-badge">ODS 13</span>
-                </div>
-            </div>
+    <section class="col-12 col-lg-6">
+      <form id="formVinc" class="card card-body" novalidate>
+        <h2 class="h5">Ligar idoso a voluntário</h2>
+        <div class="row g-3">
+          <div class="col-12"><label class="form-label" for="idIdoso">Idoso *</label>
+            <select class="form-select" id="idIdoso" name="idIdoso"></select></div>
+          <div class="col-12 col-md-8"><label class="form-label" for="idVoluntario">Voluntário *</label>
+            <select class="form-select" id="idVoluntario" name="idVoluntario"></select></div>
+          <div class="col-12 col-md-4"><label class="form-label" for="papel">Papel *</label>
+            <select class="form-select" id="papel" name="papel"><option value="TITULAR">Titular</option><option value="RESERVA">Reserva</option></select></div>
         </div>
-    </footer>
+        <button class="btn btn-primary mt-3" type="submit">Criar vínculo</button>
+      </form>
+      <h2 class="h5 mt-4">Vínculos</h2>
+      <div id="listaVinc"></div>
+    </section>
+  </div>
+</main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/api.js"></script>
-    <script src="js/motion.js"></script>
-    <script src="js/voluntarios.js"></script>
+<script src="lib/bootstrap.bundle.min.js"></script>
+<script src="app.js"></script>
+<script>
+const formVol = document.getElementById('formVol'), formVinc = document.getElementById('formVinc');
+const TIPOS = { VIZINHO: 'Vizinho', FAMILIAR: 'Familiar', SINDICO: 'Síndico', IGREJA: 'Igreja', ACS: 'Agente de saúde', OUTRO: 'Outro' };
+let voluntarios = [];
+
+async function carregar() {
+  const regioes = await tentar(() => api('regioes'));
+  if (!regioes) return;
+  opcoes(document.getElementById('idRegiaoVol'), regioes, 'id', r => `${r.nome} (${r.cidade})`, 'Escolha...');
+  const [vols, idosos, vincs, furos] = await Promise.all([api('voluntarios'), api('idosos'), api('vinculos'), api('relatorios/furos')]);
+  voluntarios = vols;
+  const nomeRegiao = id => (regioes.find(r => r.id === id) || {}).nome || '';
+  opcoes(document.getElementById('idIdoso'), idosos, 'id', i => i.nome, 'Escolha o idoso...');
+  opcoes(document.getElementById('idVoluntario'), vols, 'id', v => `${v.nome} (${TIPOS[v.tipo]})`, 'Escolha o voluntário...');
+
+  document.getElementById('furos').innerHTML = furos.length ? `<div class="alert alert-warning">
+    <strong>Rede incompleta:</strong> ${furos.map(f => `${esc(f.idoso)} (${f.cuidadores_ativos} de 2)`).join(', ')}.
+    Sem reserva, quando o titular não consegue falar, o idoso já vira crítico.</div>` : '';
+
+  document.getElementById('listaVol').innerHTML = vols.length ? `<div class="table-responsive"><table class="table table-striped align-middle">
+    <thead><tr><th>Nome</th><th>Quem é</th><th>Telefone</th><th>Região</th><th>Ações</th></tr></thead><tbody>
+    ${vols.map(v => `<tr><td>${esc(v.nome)}</td><td>${TIPOS[v.tipo]}</td><td>${esc(v.telefone)}</td><td>${esc(nomeRegiao(v.idRegiao))}</td>
+      <td><div class="d-flex flex-wrap gap-1"><button class="btn btn-sm btn-outline-primary" onclick="editar(${v.id})">Editar</button>
+      <button class="btn btn-sm btn-outline-danger" onclick="desativar(${v.id}, this)">Desativar</button></div></td></tr>`).join('')}
+    </tbody></table></div>` : '<p>Nenhum voluntário.</p>';
+
+  document.getElementById('listaVinc').innerHTML = vincs.length ? `<div class="table-responsive"><table class="table table-striped align-middle">
+    <thead><tr><th>Idoso</th><th>Voluntário</th><th>Papel</th><th>Ações</th></tr></thead><tbody>
+    ${vincs.map(v => `<tr><td>${esc(v.idoso)}</td><td>${esc(v.voluntario)}</td>
+      <td><span class="badge text-bg-${v.papel === 'TITULAR' ? 'primary' : 'info'}">${v.papel === 'TITULAR' ? 'Titular' : 'Reserva'}</span></td>
+      <td class="text-nowrap"><button class="btn btn-sm btn-outline-primary" onclick="trocar(${v.id_idoso}, ${v.id_voluntario}, '${v.papel}')">Trocar papel</button>
+      <button class="btn btn-sm btn-outline-danger" onclick="remover(${v.id_idoso}, ${v.id_voluntario})">Remover</button></td></tr>`).join('')}
+    </tbody></table></div>` : '<p>Nenhum vínculo.</p>';
+}
+
+function limparVol() {
+  formVol.reset();
+  formVol.elements.id.value = '';
+  document.getElementById('tituloVol').textContent = 'Novo voluntário';
+  limparErros(formVol);
+}
+
+function editar(id) {
+  preencherForm(formVol, voluntarios.find(v => v.id === id));
+  document.getElementById('tituloVol').textContent = 'Editando voluntário';
+  formVol.scrollIntoView({ behavior: 'smooth' });
+}
+
+async function desativar(id, botao) {
+  if (botao.dataset.confirmar !== 'sim') {
+    botao.dataset.confirmar = 'sim';
+    botao.textContent = 'Confirmar?';
+    return;
+  }
+  if (await tentar(() => api('voluntarios/excluir', { id }), 'Voluntário desativado e removido dos vínculos.') !== undefined) carregar();
+}
+
+async function trocar(idIdoso, idVoluntario, papel) {
+  const r = await tentar(() => api('vinculos/papel', { idIdoso, idVoluntario, papel: papel === 'TITULAR' ? 'RESERVA' : 'TITULAR' }), 'Papel trocado.');
+  if (r) carregar();
+}
+
+async function remover(idIdoso, idVoluntario) {
+  const r = await tentar(() => api('vinculos/excluir', { idIdoso, idVoluntario }), 'Vínculo removido.');
+  if (r) carregar();
+}
+
+formVol.addEventListener('submit', async e => {
+  e.preventDefault();
+  limparErros(formVol);
+  const d = dadosForm(formVol);
+  d.telefone = soDigitos(d.telefone);
+  let ok = true;
+  if (d.nome.length < 2) ok = erroCampo(formVol, 'nome', 'Informe o nome (mínimo 2 letras).');
+  if (!/^\d{10,11}$/.test(d.telefone)) ok = erroCampo(formVol, 'telefone', 'Use DDD + número (10 ou 11 dígitos).');
+  if (!d.idRegiao) ok = erroCampo(formVol, 'idRegiao', 'Escolha a região.');
+  if (!ok) return;
+  const r = await tentar(() => api('voluntarios', d), d.id ? 'Voluntário atualizado.' : 'Voluntário cadastrado.');
+  if (r) { limparVol(); carregar(); }
+});
+
+formVinc.addEventListener('submit', async e => {
+  e.preventDefault();
+  limparErros(formVinc);
+  const d = dadosForm(formVinc);
+  let ok = true;
+  if (!d.idIdoso) ok = erroCampo(formVinc, 'idIdoso', 'Escolha o idoso.');
+  if (!d.idVoluntario) ok = erroCampo(formVinc, 'idVoluntario', 'Escolha o voluntário.');
+  if (!ok) return;
+  const r = await tentar(() => api('vinculos', d), 'Vínculo criado.');
+  if (r) carregar();
+});
+document.getElementById('limparVol').addEventListener('click', limparVol);
+carregar();
+</script>
 </body>
 </html>

@@ -1,154 +1,173 @@
-# Plantão Clima — CitizenTech (FIAP Global Solution 2026/2 · 2ESOA)
+# Plantão Clima
 
-Sistema comunitário de coordenação de ligações para proteger **idosos que moram sozinhos** durante **ondas de calor extremo** e **chuvas fortes** agravadas pelo El Niño.
+Global Solution 2026/2 (CitizenTech) · FIAP · Engenharia de Software · 2ESOA
 
-> **Aviso de responsabilidade:** O Plantão Clima complementa a orientação oficial da Defesa Civil e das UBS e **não substitui** os serviços públicos de emergência (**SAMU 192**, **Bombeiros 193** e **Defesa Civil 199**).
+**Vídeo pitch (até 3 min):** [PREENCHER: link público do YouTube, Google Drive ou Vimeo]
 
----
+## Problema
 
-## 1. O Problema e o Cidadão Beneficiado
+No Censo 2022, 5,6 milhões de pessoas de 60 anos ou mais moram sozinhas no Brasil (1,3 milhão em SP).
+Em dias de calor extremo ou de chuva forte, a orientação oficial é "verifique os idosos que moram sozinhos".
+O problema é que ninguém organiza quem liga para quem, quem cobre quando a ligação não é atendida e quem ficou sem ninguém.
 
-- **5,6 milhões de pessoas com 60 anos ou mais moram sozinhas no Brasil** (Censo 2022 / IBGE).
-- Ondas de calor extremo causaram cerca de **48 mil mortes em excesso** em 14 regiões metropolitanas brasileiras entre 2000 e 2018 (PLOS ONE), e chuvas intensas representam a maior parte dos alertas da Defesa Civil.
-- A orientação oficial já recomenda *"verificar os idosos que moram sozinhos"*, mas ninguém organiza **quem liga para quem**, **quem cobre quando ninguém atende** e **quem ficou sem ser checado**.
-- **Quem é protegido:** o idoso que mora sozinho (especialmente com doença crônica, mobilidade reduzida, casa sem ventilação ou residência em área de risco). **Ele não usa aplicativo nenhum — apenas atende o telefone.**
-- **Quem usa o sistema:** o coordenador comunitário (síndico, igreja, associação de bairro ou agente de saúde) e os voluntários que o idoso já conhece (vizinhos e familiares).
+## Solução
 
-### Evolução a partir do FloodGuard
-Este projeto incorpora e evolui o conceito de **monitoramento territorial por regiões** desenvolvido pela nossa equipe no projeto anterior **FloodGuard** (agora integrado como o *Mapa Territorial de Risco* no Painel do Plantão Clima), ampliando o foco para **ondas de calor e chuvas intensas** com foco direto na proteção ativa de idosos isolados.
+O Plantão Clima é uma rede de vizinhos, familiares, síndicos, igrejas e agentes de saúde que liga para idosos que moram sozinhos quando sai um alerta de calor ou de chuva.
 
----
+- **O idoso não usa app.** Ele só atende o telefone (celular ou fixo).
+- **Cada idoso tem 1 voluntário titular e 1 reserva**, que são pessoas que ele já conhece.
+- **No dia do alerta, o aviso oficial do Inmet entra sozinho**: a cada 30 minutos o servidor consulta a API pública de avisos do Inmet. Se a cidade de uma região cadastrada está num aviso de chuva, tempestade ou calor, o sistema cria o alerta e gera a rodada de ligações. Aviso da Defesa Civil ou de outra fonte, o coordenador cadastra na mão. O sistema também sugere a temperatura pelo Open-Meteo.
+- **Na chuva, o alerta pode chegar sozinho pelo FloodGuard** (nosso projeto anterior): o sensor de nível do córrego manda a leitura e, a partir de 70% da cota de transbordo, o sistema cria o alerta e já gera a rodada. Ninguém precisa digitar nada.
+- **Cada voluntário vê as suas ligações no celular** e registra o resultado: *Está bem*, *Precisa de atenção*, *Precisa de ajuda* ou *Não atendeu*.
+  - *Precisa de atenção* mostra um checklist de calor ou de chuva.
+  - *Precisa de ajuda* mostra primeiro o botão do 192, ou do 193/199 na chuva.
+- **Escalada automática:**
+  - Se o titular não consegue falar com o idoso, a ligação passa para o reserva.
+  - Se ninguém consegue, o idoso vira **crítico** e vai para o topo do painel, com a orientação de mandar alguém até a casa.
+- **O risco depende do tipo de alerta:**
+  - Calor: doença crônica, casa sem ventilação, mobilidade reduzida e idade de 80 anos ou mais.
+  - Chuva: área de risco (peso 2), mobilidade reduzida e idade de 80 anos ou mais.
+- **Funciona no papel:** dá para imprimir a lista e lançar os resultados depois.
+- **LGPD:**
+  - Só guardamos os dados mínimos, com consentimento da pessoa ou do responsável.
+  - Excluir um idoso anonimiza o cadastro: nome, telefones, endereço e flags de saúde são apagados.
+  - O relatório para a UBS e a Defesa Civil é só agregado, sem nomes.
 
-## 2. Como o Sistema Funciona
+### Braço FloodGuard
 
-1. **Cadastro mínimo e consentimento (LGPD):** o coordenador cadastra os idosos (guardando apenas o **ano de nascimento**, sem data completa nem CPF, com consentimento registrado), os voluntários de confiança e o **vínculo de cuidado** de cada idoso com um voluntário **Titular** e um **Reserva**.
-2. **Registro de alerta climático:** ao sair um alerta de **CALOR** ou **CHUVA** (INMET / Defesa Civil / CEMADEN), o coordenador registra o alerta no sistema.
-3. **Fila de ligações priorizada por risco:** o backend Java calcula automaticamente a pontuação de risco (0 a 100):
-   - No **CALOR**, pesam mais *doença crônica* (+35) e *casa sem ventilação* (+30).
-   - Na **CHUVA**, pesam mais *área de risco* (+35) e *mobilidade reduzida* (+30).
-   - A faixa etária estimada soma até +25 pontos.
-4. **Registro da ligação pelo celular:** o voluntário liga e escolhe:
-   - **Está bem**
-   - **Precisa de atenção** (abre checklist interativo específico de Calor ou de Chuva)
-   - **Precisa de ajuda** (exibe imediatamente os números 192, 193 e 199)
-   - **Não atendeu**
-5. **Escalonamento automático:**
-   - Se o **Titular** marca *Não atendeu*, a ligação passa automaticamente para o **Reserva**.
-   - Se o **Reserva** também marca *Não atendeu* (ou se não houver reserva cadastrado), o idoso sobe como **CRÍTICO** no topo do Painel, orientando enviar alguém até a residência e acionar **193, 192 ou 199**.
-6. **Inclusão e operação offline:** a lista da rodada possui layout otimizado de impressão (`Imprimir Lista Offline`) para comunidades sem internet estável.
-7. **Privacidade para UBS e Defesa Civil:** relatórios externos saem **agregados por região e 100% anonimizados**, sem nomes pessoais.
+O FloodGuard monitorava córregos com sensores de nível de água e mostrava o mapa de risco de alagamento por região. Faltava o último passo: avisar quem não lê alerta no celular. No Plantão Clima ele vira a entrada automática do alerta de chuva:
 
----
+| Leitura do sensor (% da cota de transbordo) | O que acontece |
+|---|---|
+| até 69% | Nada. Nível normal. |
+| 70% a 89% | Cria o alerta de chuva no nível **Alerta** e gera a rodada de ligações. |
+| 90% ou mais | Nível **Máximo**. Se o alerta do dia já existe, só sobe o nível, nunca baixa, e não duplica ligações. |
 
-## 3. Arquitetura e Tecnologias (Conteúdo até a Fase 7)
+Rota `POST /api/sensor` (`idRegiao`, `percentual`), regra em `AlertaService.leituraSensor`. Na tela **Alertas**, o card "Sensor FloodGuard" simula a leitura para a demonstração.
 
-- **Linguagem:** Java 17 (POO pura, sem frameworks externos)
-- **Persistência:** JDBC puro + **H2 Database 2.3 em modo Oracle** (`MODE=Oracle`), driver incluído em `lib/h2-2.3.232.jar`
-- **Camadas separadas por pacote:**
-  - `br.com.plantaoclima.model`: superclasse abstrata `Pessoa`, interface `AvaliavelRisco`, entidades `Regiao`, `Idoso`, `Voluntario`, `VinculoCuidado`, `Alerta`, `Checagem`, enums e DTOs de relatórios.
-  - `br.com.plantaoclima.exception`: `ValidacaoException`, `RecursoNaoEncontradoException`, `PersistenciaException`.
-  - `br.com.plantaoclima.dao`: `DatabaseConfig`, interface `CrudDao<T>`, 6 DAOs com CRUD completo via `PreparedStatement` + `RelatorioDao` com consultas SQL (`JOIN`, `LEFT JOIN`, `GROUP BY`, `HAVING`).
-  - `br.com.plantaoclima.service`: regras de negócio, validações LGPD, geração de rodada priorizada e motor de escalonamento automático.
-  - `br.com.plantaoclima.http`: `PlantaoClimaServer` (JDK `HttpServer`), `ApiHandler` (API REST JSON conectando a web diretamente ao banco H2), `StaticFileHandler` e `JsonUtil`.
-  - `br.com.plantaoclima.cli`: `ConsoleApp` opcional para inspeção via terminal (`--cli`).
-- **Banco de Dados (6 tabelas):** `REGIAO`, `IDOSO`, `VOLUNTARIO`, `VINCULO_CUIDADO` (associativa N:N), `ALERTA` e `CHECAGEM`.
-- **Interface Web (5 telas responsivas em HTML5 semântico + Bootstrap 5 + JS):**
-  1. `web/index.html` — **Painel** (Casos Críticos no topo, KPIs, Alertas Ativos e Mapa Territorial FloodGuard)
-  2. `web/idosos.html` — **Idosos** (CRUD completo com validação em JS e consentimento LGPD)
-  3. `web/voluntarios.html` — **Voluntários e Vínculos** (CRUD de voluntários + vínculos N:N Titular/Reserva)
-  4. `web/alertas.html` — **Alertas e Rodada** (CRUD de alertas, fila ordenada por risco, checklists, escalonamento e impressão offline)
-  5. `web/relatorios.html` — **Relatórios** (Consultas SQL ao vivo + relatório anonimizado para UBS/Defesa Civil)
+### Dados reais e ao vivo (APIs públicas, sem chave)
 
----
+| API | O que alimenta | Onde |
+|---|---|---|
+| Inmet, avisos ativos (`apiprevmet3.inmet.gov.br/avisos/ativos`) | Alerta de chuva/tempestade ou calor do dia, com nível pela cor oficial: amarelo = atenção, laranja = alerta, vermelho = máximo. A área do aviso aparece no mapa do Painel | `InmetService`, consulta automática no `App` a cada 30 min, `GET/POST /api/inmet`, tela Alertas |
+| Open-Meteo (`api.open-meteo.com`) | Sugestão da temperatura máxima do dia; no Painel, máxima e chuva previstas para hoje em cada região e no mapa (grade de 81 pontos) | `PrevisaoService`, `GET /api/previsao`; Painel do dia (direto no navegador) |
+| Mapa base Esri World Light Gray (dados OpenStreetMap e outros) | Fundo do mapa do Painel | Leaflet 1.9.4 local em `web/lib/leaflet` |
+| BrasilAPI, CEP (`brasilapi.com.br/api/cep/v2`) | Rua e bairro no cadastro do idoso, a partir do CEP | Tela Idosos (direto no navegador) |
 
-## 4. Como Compilar e Executar
+Sem internet, o sistema continua funcionando: a consulta falha com aviso no log e o coordenador cadastra o alerta à mão. O mapa fica sem fundo e sem previsão, mas os pinos das regiões e os cartões continuam. A leitura do JSON do Inmet é testada com uma amostra offline na `Verificacao`.
 
-### Pré-requisitos
-- **JDK 17 ou superior** (`java` e `javac`).
-- Nenhuma instalação de banco de dados externa é necessária — o driver H2 já está incluso em `lib/h2-2.3.232.jar` e cria/popula o banco automaticamente a partir de `sql/plantao_clima.sql` na primeira execução.
+### Adoção e divulgação em escala
 
-### Opção A — Execução rápida (Windows)
-Abra o terminal dentro da pasta `plantao-clima` e execute:
-```bat
-run.bat
-```
+O sistema não pede que ninguém mude de hábito: o idoso só atende o telefone, o voluntário aperta um botão por ligação e a coordenação usa redes que já existem. A página **Como funciona** (`web/como-funciona.html`) mostra isso para quem vai adotar e tem um cartaz imprimível para recrutar vizinhos.
 
-### Opção B — Execução rápida (Linux / macOS)
+- **Onde cadastrar:** agentes comunitários de saúde (já visitam os idosos em casa), CRAS, igrejas e associações, síndicos e zeladores.
+- **Como o aviso chega:** Inmet, Defesa Civil (o SMS 40199 já chega ao voluntário), Open-Meteo e o sensor FloodGuard.
+- **Plano em 3 passos:**
+  1. Piloto num bairro: 1 UBS, 1 igreja e 2 prédios, com cerca de 50 idosos, num verão. Meta: todos com notícia em até 2 h depois do aviso.
+  2. A cidade adota, com Secretaria de Saúde e Defesa Civil na coordenação.
+  3. Rede nacional: código aberto, cada município roda o seu servidor.
+- **Como medir:** o relatório R1 dá o % de idosos com contato em até 4 h e os críticos, e o R2 mostra os furos na rede antes do próximo alerta.
+
+### ODS
+
+- **ODS 3** (saúde e bem-estar): evitar mortes por calor e por enchente entre idosos.
+- **ODS 10** (redução das desigualdades): quem mora sozinho e não usa smartphone também recebe o aviso.
+- **ODS 11** (cidades sustentáveis): rede comunitária de resposta a desastres.
+- **ODS 13** (ação climática): adaptação a eventos extremos.
+
+### Design e acessibilidade
+
+- **Painel de controle:** o Painel do dia mostra todos os alertas de uma vez, sem seletor. Um cartão por região, do mais grave para o mais leve, com o nível, quantas pessoas já deram notícia e a previsão do dia. Ao lado, um mapa com os pinos das regiões (número = pessoas sem notícia), a área oficial do aviso do Inmet e as camadas de temperatura máxima e de chuva previstas para hoje. Clicar num cartão ou num pino abre a rodada da região. A lista de cartões tem as mesmas informações do mapa, para quem usa leitor de tela.
+- Referências do painel: Painel de Alertas do Cemaden, CGE-SP, MeteoAlarm e NWS (mapa e lista sincronizados, contagem por nível, o alerta mais grave de cada área em destaque).
+- Cores do painel na escala de avisos do Inmet: amarelo, laranja e vermelho. O vermelho fica só para o que é crítico.
+- Todos os pares de cor passam no contraste AA do WCAG.
+- Fonte Atkinson Hyperlegible Next (Braille Institute), feita para baixa visão, servida localmente.
+- Botões com no mínimo 44 px (56 px no "Ligar agora"), foco visível pelo teclado e respeito ao "reduzir movimento" do sistema.
+- A **fita da rodada** mostra num olhar quem já deu notícia, com um segmento por idoso. O **protocolo** mostra em qual passo da escalada a rodada está.
+- O topo indica se o servidor Java + H2 está no ar.
+- Barra de acessibilidade em todas as páginas: aumentar e diminuir a letra (até 137,5%) e alto contraste, com a escolha salva no navegador. Link "Pular para o conteúdo" para quem navega pelo teclado.
+- Daltonismo: nenhum estado depende só da cor. Na fita e na legenda cada estado tem também textura e símbolo (✓ está bem, ! atenção, !! ajuda, × ninguém atendeu, ↻ com o reserva), e os gráficos trazem o número escrito.
+- O painel se atualiza sozinho a cada minuto, sem tirar o foco de quem está usando um botão.
+
+**Pivô:** começamos com um tema de finanças. A validação mostrou que app para o público vulnerável não pega, então mudamos para uma solução em que o idoso só precisa atender o telefone. A primeira versão era só de calor (Plantão Calor); depois incluímos chuva para cobrir o outro evento extremo mais comum.
+
+## Como rodar
+
+Requisito: Java 8 ou mais novo. O banco H2 já está em `lib/` e é criado sozinho na primeira execução, a partir do `sql/script.sql`.
+
+Todos os comandos devem ser executados **na pasta do projeto**.
+
+**Opção 1: terminal, sem Maven** (classes já compiladas em `target/classes`):
+
 ```bash
-chmod +x run.sh
-./run.sh
+java -cp "target/classes:lib/*" br.com.fiap.plantao.App
+# Windows: java -cp "target/classes;lib/*" br.com.fiap.plantao.App
 ```
 
-### Opção C — Compilação e execução manual (qualquer sistema)
-1. **Compilar:**
-   ```bash
-   mkdir -p build/classes
-   javac -encoding UTF-8 -cp "lib/h2-2.3.232.jar" -d build/classes src/main/java/br/com/plantaoclima/*.java src/main/java/br/com/plantaoclima/*/*.java
-   ```
-   *(No Windows PowerShell, use `Get-ChildItem -Recurse src\main\java -Filter *.java | ForEach-Object { '"' + $_.FullName + '"' } | Set-Content -Encoding ASCII build\sources.txt` e depois `javac -encoding UTF-8 -cp "lib\h2-2.3.232.jar" -d build\classes @build\sources.txt`.)*
+**Opção 2: Maven ou IntelliJ** (abrir o `pom.xml`):
 
-2. **Executar o servidor Java + H2 + Interface Web:**
-   - **Windows:**
-     ```bat
-     java -cp "build\classes;lib\h2-2.3.232.jar" br.com.plantaoclima.Main
-     ```
-   - **Linux / macOS:**
-     ```bash
-     java -cp "build/classes:lib/h2-2.3.232.jar" br.com.plantaoclima.Main
-     ```
-
-3. **Abrir no navegador:**
-   Acesse **[http://localhost:8080](http://localhost:8080)**
-
-   - *Modo console opcional:* execute adicionando `--cli` ao final do comando `java`.
-   - *Abertura direta do HTML:* também é possível abrir `web/index.html` diretamente no navegador (se o servidor Java estiver rodando em `localhost:8080`, a página conecta automaticamente ao banco H2; se estiver desligado, ativa um modo demonstração local com aviso no topo).
-
-### Executar o script SQL isoladamente (verificação do banco)
 ```bash
-java -cp "lib/h2-2.3.232.jar" org.h2.tools.RunScript -url "jdbc:h2:mem:teste;MODE=Oracle;DATABASE_TO_UPPER=TRUE" -user sa -script "sql/plantao_clima.sql"
+mvn compile exec:java
 ```
 
----
+Depois abra **http://localhost:8080**. Também dá para abrir o `web/index.html` direto no navegador com o servidor ligado.
+O terminal mostra o endereço para acessar pelo celular na mesma rede Wi-Fi.
 
-## 5. Relatórios SQL Implementados
+Para outra porta, use `-Dporta=9090`. Para apagar o banco e recriar com os dados de exemplo, apague a pasta `data/`.
 
-Todos os relatórios estão disponíveis na tela **Relatórios** (`/relatorios.html`) e no endpoint `GET /api/relatorios`:
+**Oracle (opcional):**
 
-1. **Percentual de idosos checados em até 4 horas** (`ALERTA LEFT JOIN CHECAGEM` com cálculo temporal `INTERVAL '4' HOUR`).
-2. **Idosos com rede incompleta** (`IDOSO LEFT JOIN VINCULO_CUIDADO GROUP BY ... HAVING` identificando falta de Titular e/ou Reserva).
-3. **Taxa de "não atendeu" por voluntário** (`VOLUNTARIO LEFT JOIN CHECAGEM` com agregação condicional `SUM(CASE WHEN ...)`).
-4. **Relatório agregado e anonimizado por região para UBS e Defesa Civil** (sem nomes ou telefones individuais).
+1. Rode `sql/script.sql` no Oracle SQL Developer.
+2. Adicione o driver `ojdbc` no classpath.
+3. Inicie a aplicação com `-Ddb.url=jdbc:oracle:thin:@host:1521/servico -Ddb.user=RM -Ddb.pass=senha`.
 
----
+**Testes das regras** (39 verificações num banco em memória):
 
-## 6. Diagramas e Documentos da Entrega
+```bash
+java -cp "target/classes:lib/*" br.com.fiap.plantao.Verificacao
+```
 
-- **Script SQL completo (DDL + Carga Inicial):** [`sql/plantao_clima.sql`](sql/plantao_clima.sql)
-- **Diagrama Entidade-Relacionamento (DER):** [`docs/diagrama-er.pdf`](docs/diagrama-er.pdf) e [`docs/diagrama-er.png`](docs/diagrama-er.png)
-- **Diagrama de Classes (UML):** [`docs/diagrama-classes-uml.pdf`](docs/diagrama-classes-uml.pdf) e [`docs/diagrama-classes-uml.png`](docs/diagrama-classes-uml.png)
-- **Dados do grupo e link do vídeo pitch:** [`entrega-grupo.txt`](entrega-grupo.txt)
-- **Roteiro de apoio do Vídeo Pitch (3 min):** [`docs/roteiro-pitch-3min.md`](docs/roteiro-pitch-3min.md)
+## Estrutura
 
----
+| Pasta | Conteúdo |
+|---|---|
+| `sql/script.sql` | DDL das 6 tabelas, constraints, dados de exemplo e as consultas dos relatórios |
+| `src/main/java/br/com/fiap/plantao/model` | Entidades. `Pessoa` (abstrata) é a base de `Idoso` e `Voluntario`, cada uma com o próprio `validar()`. `Idoso` implementa a interface `AvaliavelRisco` |
+| `.../dao` | JDBC com `PreparedStatement`. A interface `Dao<T>` define o CRUD; a escalada roda em transação (commit/rollback) |
+| `.../service` | Regras: gerar a rodada, registrar a ligação, escalar para o reserva ou crítico, sugestão do Open-Meteo, avisos do Inmet ao vivo (`InmetService`), leitura do sensor FloodGuard |
+| `.../http` | Servidor HTTP (JDK, sem framework) com a API JSON e os arquivos de `web/` |
+| `.../exception` | `RegraNegocioException` (erro do usuário, HTTP 400), `RecursoNaoEncontradoException` (registro inexistente, HTTP 404) e `PersistenciaException` (erro do sistema, HTTP 500) |
+| `web/` | 6 páginas com Bootstrap e Leaflet locais: Painel do dia, Idosos, Voluntários e vínculos, Alertas e regiões, Relatórios, Como funciona |
+| `docs/` | DER e UML (PNG, mais o fonte Mermaid `.mmd`) e o roteiro do pitch |
 
-## 7. Conexão com os ODS da ONU
+**Banco:**
 
-- **ODS 3 — Saúde e Bem-Estar:** reduz mortes evitáveis e agravamento de doenças crônicas em idosos durante ondas de calor extremo e enchentes por meio de acompanhamento preventivo rápido.
-- **ODS 11 — Cidades e Comunidades Sustentáveis:** fortalece redes comunitárias resilientes e inclusivas que funcionam mesmo em cenários de baixa conectividade e sem exigir alfabetização digital do idoso.
-- **ODS 13 — Ação contra a Mudança Global do Clima:** transforma alertas meteorológicos (INMET/Defesa Civil) em ações locais concretas de adaptação climática.
+- Tabelas: `regiao`, `idoso`, `voluntario`, `vinculo_cuidado`, `alerta` e `checagem`.
+- O relacionamento N:N é idoso ↔ voluntário, pela tabela `vinculo_cuidado`. Ela tem PK composta e papel TITULAR/RESERVA único por idoso.
 
----
+**Relatórios:**
 
-## 8. Vídeo Pitch
+- R1: cobertura do alerta por região, com % de checados em até 4 h e críticos.
+- R2: furos na rede, ou seja, idosos com menos de 2 voluntários.
+- R3: carga por voluntário.
 
-- **Link público do Vídeo Pitch (até 3 minutos):** `[PREENCHER_LINK_DO_VIDEO_PITCH]`
-  *(Lembre-se de testar o link em aba anônima e colocá-lo também em `entrega-grupo.txt`.)*
+## Fontes
 
----
+- Censo 2022 (IBGE): pessoas de 60+ que moram sozinhas.
+- SES-SP, Alerta Nº 01/2025: orientações e sinais de alerta do calor, usados no checklist.
+- Inmet, API de avisos ativos (apiprevmet3.inmet.gov.br/avisos/ativos): fonte principal do alerta, consultada automaticamente.
+- Defesa Civil Alerta: aviso cadastrado pelo coordenador.
+- BrasilAPI (brasilapi.com.br): busca de endereço pelo CEP.
+- Evidências da página "Como funciona": Semenza et al., NEJM 1996 (Chicago 1995); Naughton et al., AJPM 2002 (Chicago 1999); Monteiro dos Santos et al., PLOS ONE 2024 (48 mil mortes por calor no Brasil); Cetic.br, TIC Domicílios 2024; IBGE, pesquisa PEERS sobre as enchentes do RS; registro de vulneráveis da França (lei de 30/06/2004) e avaliação da Santé publique France.
+- Open-Meteo: previsão da máxima do dia (sugestão no cadastro do alerta) e grade de máxima e chuva do mapa do Painel.
+- Leaflet 1.9.4 (licença BSD-2) e mapa base Esri World Light Gray Canvas (Esri, HERE, Garmin, OpenStreetMap).
+- Inmet, escala de cores dos avisos (amarelo, laranja, vermelho): base das cores do painel.
+- WCAG 2.2 (W3C) e gov.br Design System: alvos de toque, contraste e foco.
+- Atkinson Hyperlegible Next (Braille Institute, licença OFL).
+- FloodGuard: projeto anterior do grupo, base do braço de sensores.
+- A régua 30/32/35/37 °C foi definida pelo grupo, inspirada em Campinas e no Rio. Não é protocolo oficial.
 
-## 9. Declaração de Uso de IA Generativa
+## Uso de IA generativa
 
-Em conformidade com as diretrizes da Global Solution FIAP 2026/2:
-- **Ferramentas utilizadas:** Assistente de IA (Google Gemini / Antigravity).
-- **Finalidade:** Apoio na estruturação inicial das camadas Java + JDBC + H2, revisão das consultas SQL em modo Oracle, criação do layout responsivo com suporte a impressão offline e revisão de documentação e diagramas.
-- **Revisão pela equipe:** Todo o código-fonte, regras de negócio (cálculo de risco Calor/Chuva e escalonamento Titular → Reserva → Crítico), scripts SQL e interface web foram revisados, executados e validados pela equipe antes da entrega.
+O grupo usou IA generativa (Claude, da Anthropic) como apoio na pesquisa, na revisão da proposta e na escrita de parte do código e dos diagramas.
+Todo o conteúdo foi revisado, testado e é de responsabilidade do grupo.

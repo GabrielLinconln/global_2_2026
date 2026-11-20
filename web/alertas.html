@@ -1,244 +1,273 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alertas e Rodada de Ligações — Plantão Clima</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
-    <link href="css/styles.css" rel="stylesheet">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Alertas e regiões - Plantão Clima</title>
+  <link rel="stylesheet" href="lib/bootstrap.min.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-lg pc-navbar sticky-top" aria-label="Navegação principal">
-            <div class="container">
-                <a class="navbar-brand" href="index.html">
-                    <span class="brand-dot" aria-hidden="true"></span>
-                    <span>Plantão Clima</span>
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Abrir menu">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="mainNav">
-                    <ul class="navbar-nav me-auto ms-lg-4">
-                        <li class="nav-item"><a class="nav-link" href="index.html">Painel</a></li>
-                        <li class="nav-item"><a class="nav-link" href="idosos.html">Idosos</a></li>
-                        <li class="nav-item"><a class="nav-link" href="voluntarios.html">Voluntários e Vínculos</a></li>
-                        <li class="nav-item"><a class="nav-link active" href="alertas.html">Alertas e Rodada</a></li>
-                        <li class="nav-item"><a class="nav-link" href="relatorios.html">Relatórios</a></li>
-                    </ul>
-                    <span id="connectionStatus" class="connection-pill offline my-2 my-lg-0">Conectando...</span>
-                </div>
-            </div>
-        </nav>
-    </header>
+<div id="menu"></div>
+<main class="container py-3">
+  <div id="avisos"></div>
+  <h1>Alertas</h1>
+  <p class="text-body-secondary">Os avisos do Inmet entram sozinhos. Aviso da Defesa Civil ou de outra fonte: cadastre no formulário abaixo e gere a rodada de ligações.</p>
 
-    <section class="pc-page-header">
-        <div class="container">
-            <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
-                <div>
-                    <div class="pc-kicker">INMET · Defesa Civil · Escalonamento Automático</div>
-                    <h1>Alertas e Rodada de Ligações</h1>
-                    <p>Registre um alerta climático para gerar a fila ordenada por risco, preencher checklists e escalonar ligações sem resposta.</p>
-                </div>
-                <button type="button" class="btn btn-paper no-print" onclick="window.print()">
-                    Imprimir lista (uso offline)
-                </button>
-            </div>
-        </div>
-    </section>
+  <section class="card card-body mb-4 sensor" aria-labelledby="tInmet">
+    <h2 class="h5" id="tInmet">Avisos oficiais do Inmet, ao vivo</h2>
+    <p class="mb-2">A cada 30 minutos o sistema consulta os avisos do Inmet em vigor hoje. Se a cidade de uma região cadastrada está num aviso de chuva,
+      tempestade ou calor, o alerta e a rodada de ligações são criados sem ninguém digitar nada. Amarelo vira atenção, laranja vira alerta, vermelho vira máximo.</p>
+    <div id="inmetStatus" role="status" class="inmet-status">Carregando a última consulta</div>
+    <div><button class="btn btn-primary" type="button" id="consultarInmet">Consultar o Inmet agora</button></div>
+  </section>
 
-    <main class="container">
-        <div id="feedbackAlertas" class="feedback-zone"></div>
-
-        <div class="row g-4">
-            <!-- Coluna Esquerda: Criar Alerta + Historico de Alertas -->
-            <aside class="col-lg-4 no-print" aria-label="Cadastro e selecao de alertas">
-                <div class="pc-card mb-4">
-                    <div class="pc-card-header">
-                        <span><i class="fas fa-plus-circle text-danger me-2"></i>Registrar Novo Alerta</span>
-                    </div>
-                    <form id="formAlerta" class="p-3" novalidate>
-                        <div class="mb-3">
-                            <label for="alertaTitulo" class="form-label fw-semibold">Titulo do Alerta *</label>
-                            <input type="text" class="form-control" id="alertaTitulo" required minlength="5" placeholder="Ex.: Onda de Calor 38C - INMET">
-                            <div class="invalid-feedback">Informe um titulo (minimo 5 caracteres).</div>
-                        </div>
-
-                        <div class="row g-2 mb-3">
-                            <div class="col-6">
-                                <label for="alertaTipo" class="form-label fw-semibold">Tipo *</label>
-                                <select class="form-select" id="alertaTipo" required>
-                                    <option value="CALOR">CALOR (Onda de Calor)</option>
-                                    <option value="CHUVA">CHUVA (Chuva Forte)</option>
-                                </select>
-                            </div>
-                            <div class="col-6">
-                                <label for="alertaSeveridade" class="form-label fw-semibold">Severidade *</label>
-                                <select class="form-select" id="alertaSeveridade" required>
-                                    <option value="VERMELHO">VERMELHO (Grande Perigo)</option>
-                                    <option value="LARANJA">LARANJA (Perigo)</option>
-                                    <option value="AMARELO">AMARELO (Perigo Potencial)</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="row g-2 mb-3">
-                            <div class="col-6">
-                                <label for="alertaFonte" class="form-label fw-semibold">Fonte Oficial *</label>
-                                <select class="form-select" id="alertaFonte" required>
-                                    <option value="INMET">INMET</option>
-                                    <option value="Defesa Civil">Defesa Civil</option>
-                                    <option value="CEMADEN">CEMADEN</option>
-                                    <option value="Defesa Civil / FloodGuard">FloodGuard / Sensores</option>
-                                </select>
-                            </div>
-                            <div class="col-6">
-                                <label for="alertaRegiao" class="form-label fw-semibold">Abrangencia</label>
-                                <select class="form-select" id="alertaRegiao">
-                                    <option value="">Todas as regioes</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="alertaDescricao" class="form-label fw-semibold">Orientacao / Descricao *</label>
-                            <textarea class="form-control" id="alertaDescricao" rows="2" required minlength="10" placeholder="Descreva a orientacao para os voluntarios..."></textarea>
-                            <div class="invalid-feedback">Informe a descricao (minimo 10 caracteres).</div>
-                        </div>
-
-                        <button type="submit" class="btn btn-danger w-100 fw-bold">
-                            <i class="fas fa-bolt me-2"></i>Emitir Alerta e Gerar Rodada
-                        </button>
-                    </form>
-                </div>
-
-                <div class="pc-card">
-                    <div class="pc-card-header">
-                        <span><i class="fas fa-clock-rotate-left me-2 text-primary"></i>Alertas Registrados</span>
-                    </div>
-                    <div id="listaAlertas" class="p-3 d-flex flex-column gap-2">
-                        <div class="text-muted text-center py-3">Carregando alertas...</div>
-                    </div>
-                </div>
-            </aside>
-
-            <!-- Coluna Principal: Rodada de Ligacoes -->
-            <section class="col-lg-8" aria-label="Rodada de ligacoes ordenada por risco">
-                <div class="pc-card mb-3 p-3" id="cabecalhoRodada">
-                    <div class="text-muted">Selecione um alerta para visualizar a rodada de ligacoes.</div>
-                </div>
-
-                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3 no-print">
-                    <div class="btn-group btn-group-sm" role="group" aria-label="Filtro de status da rodada">
-                        <button type="button" class="btn btn-outline-primary active" data-filtro="TODOS">Todos</button>
-                        <button type="button" class="btn btn-outline-danger" data-filtro="CRITICOS">Criticos / Ajuda</button>
-                        <button type="button" class="btn btn-outline-secondary" data-filtro="PENDENTE">Pendentes</button>
-                        <button type="button" class="btn btn-outline-warning" data-filtro="PRECISA_ATENCAO">Atencao</button>
-                        <button type="button" class="btn btn-outline-success" data-filtro="ESTA_BEM">Estao Bem</button>
-                    </div>
-                    <small class="text-muted"><i class="fas fa-arrow-down-wide-short me-1"></i>Ordenado por prioridade critica e pontuacao de risco</small>
-                </div>
-
-                <!-- Cabecalho exclusivo para impressao offline -->
-                <div class="print-only mb-3 p-2 border border-dark rounded">
-                    <strong>PLANTAO CLIMA — LISTA IMPRESSA PARA RODADA OFFLINE (SEM INTERNET)</strong><br>
-                    <small>Emergencias: SAMU 192 | Bombeiros 193 | Defesa Civil 199 · Marque a situacao a caneta e atualize no painel assim que voltar a conexao.</small>
-                </div>
-
-                <div id="listaRodada" class="d-flex flex-column gap-3">
-                    <div class="pc-card p-4 text-center text-muted">Carregando rodada de ligacoes...</div>
-                </div>
-            </section>
-        </div>
-    </main>
-
-    <!-- Modal Checklist: Precisa de Atencao (Calor ou Chuva) -->
-    <div class="modal fade" id="modalChecklist" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-warning-subtle">
-                    <h5 class="modal-title fw-bold" id="modalChecklistTitulo">
-                        <i class="fas fa-clipboard-check text-warning me-2"></i>Checklist de Orientacao
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                </div>
-                <form id="formChecklist">
-                    <div class="modal-body">
-                        <input type="hidden" id="chkIdChecagem">
-                        <p class="small text-muted mb-3" id="chkSubtitulo"></p>
-                        <div id="chkItensContainer" class="mb-3"></div>
-                        <div class="mb-2">
-                            <label for="chkObs" class="form-label fw-semibold">Observacao da ligacao</label>
-                            <textarea class="form-control" id="chkObs" rows="2" placeholder="Ex.: Orientado a beber agua fresca; retornaremos em 1 hora."></textarea>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-warning fw-bold">Registrar "Precisa de Atencao"</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+  <form id="formSensor" class="card card-body mb-4 sensor" novalidate>
+    <h2 class="h5">Sensor FloodGuard</h2>
+    <p class="mb-3">O sensor de nível do córrego (projeto FloodGuard) manda a leitura sozinho. A partir de 70% da cota de transbordo,
+      o alerta de chuva é criado e a rodada de ligações já sai pronta, sem ninguém cadastrar nada. Para testar, envie uma leitura.</p>
+    <div class="row g-3 align-items-end">
+      <div class="col-12 col-md-4"><label class="form-label" for="sensorRegiao">Região do sensor *</label>
+        <select class="form-select" id="sensorRegiao" name="idRegiao"></select></div>
+      <div class="col-6 col-md-3"><label class="form-label" for="percentual">Nível da água (% da cota) *</label>
+        <input class="form-control" id="percentual" name="percentual" inputmode="numeric" placeholder="ex.: 92"></div>
+      <div class="col-6 col-md-5"><button class="btn btn-primary w-100" type="submit">Enviar leitura do sensor</button></div>
     </div>
+    <p class="small text-body-secondary mt-2 mb-0">Até 69%: normal. 70%: nível de alerta. 90%: nível máximo. O sensor só sobe o nível do dia, nunca baixa.</p>
+  </form>
 
-    <!-- Modal Emergencia: Precisa de Ajuda (192 / 193 / 199) -->
-    <div class="modal fade" id="modalAjuda" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-danger border-2">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title fw-bold">
-                        <i class="fas fa-kit-medical me-2"></i>EMERGENCIA — Acione Ajuda Imediata
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                </div>
-                <form id="formAjuda">
-                    <div class="modal-body">
-                        <input type="hidden" id="ajudaIdChecagem">
-                        <div class="alert alert-danger fw-semibold">
-                            Se o idoso relata falta de ar, dor no peito, desmaio, confusao mental ou agua entrando em casa, ligue agora:
-                        </div>
-                        <div class="d-grid gap-2 mb-3">
-                            <a href="tel:192" class="btn btn-danger btn-lg fw-bold"><i class="fas fa-ambulance me-2"></i>LIGAR 192 — SAMU (Emergencia Medica)</a>
-                            <a href="tel:193" class="btn btn-warning btn-lg fw-bold text-dark"><i class="fas fa-fire-extinguisher me-2"></i>LIGAR 193 — Corpo de Bombeiros</a>
-                            <a href="tel:199" class="btn btn-dark btn-lg fw-bold"><i class="fas fa-shield-halved me-2"></i>LIGAR 199 — Defesa Civil</a>
-                        </div>
-                        <p class="small mb-2" id="ajudaEnderecoResumo"></p>
-                        <div class="mb-2">
-                            <label for="ajudaObs" class="form-label fw-semibold">Descreva o ocorrido para a coordenacao *</label>
-                            <textarea class="form-control" id="ajudaObs" rows="2" required placeholder="Ex.: Relatou tontura forte e falta de ar; SAMU 192 acionado."></textarea>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Voltar</button>
-                        <button type="submit" class="btn btn-danger fw-bold">Confirmar Registro de Ajuda</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+  <form id="formAlerta" class="card card-body mb-4" novalidate>
+    <h2 id="tituloAlerta" class="h5">Novo alerta</h2>
+    <input type="hidden" name="id">
+    <div class="row g-3">
+      <div class="col-6 col-md-3"><label class="form-label" for="tipo">Tipo *</label>
+        <select class="form-select" id="tipo" name="tipo"><option value="CALOR">Calor extremo</option><option value="CHUVA">Chuva forte</option></select></div>
+      <div class="col-6 col-md-3"><label class="form-label" for="idRegiao">Região *</label>
+        <select class="form-select" id="idRegiao" name="idRegiao"></select></div>
+      <div class="col-6 col-md-3"><label class="form-label" for="dataAlerta">Data *</label>
+        <input class="form-control" id="dataAlerta" name="dataAlerta" type="date"></div>
+      <div class="col-6 col-md-3"><label class="form-label" for="nivel">Nível *</label>
+        <select class="form-select" id="nivel" name="nivel">
+          <option value="OBSERVACAO">Observação</option><option value="ATENCAO">Atenção</option><option value="ALERTA">Alerta</option><option value="MAXIMO">Máximo</option></select></div>
+      <div class="col-6 col-md-3"><label class="form-label" for="tempMax">Temperatura máxima (°C)</label>
+        <input class="form-control" id="tempMax" name="tempMax" inputmode="decimal"></div>
+      <div class="col-6 col-md-3"><label class="form-label" for="origem">Origem *</label>
+        <select class="form-select" id="origem" name="origem">
+          <option value="INMET">Inmet</option><option value="DEFESA_CIVIL">Defesa Civil</option><option value="OPEN_METEO">Open-Meteo</option><option value="FLOODGUARD">Sensor FloodGuard</option><option value="MANUAL">Manual</option></select></div>
+      <div class="col-12 col-md-6"><label class="form-label" for="fonteAviso">Texto do aviso oficial</label>
+        <input class="form-control" id="fonteAviso" name="fonteAviso" maxlength="200"></div>
     </div>
+    <div class="d-flex flex-wrap gap-2 mt-3">
+      <button class="btn btn-primary" type="submit">Salvar</button>
+      <button class="btn btn-outline-primary" type="button" id="sugerir">Sugerir temperatura pelo Open-Meteo</button>
+      <button class="btn btn-outline-secondary" type="button" id="limparAlerta">Limpar</button>
+    </div>
+    <p class="small text-body-secondary mt-2 mb-0">Régua do grupo para calor (máxima do dia): 30 °C observação, 32 °C atenção, 35 °C alerta, 37 °C máximo.
+      Inspirada em Campinas e no Rio; não é protocolo oficial. O aviso do Inmet/Defesa Civil vem primeiro.</p>
+  </form>
 
-    <footer class="pc-footer py-4">
-        <div class="container">
-            <div class="row g-2 align-items-center">
-                <div class="col-md-8">
-                    <strong class="text-dark">Plantão Clima</strong> · Escalonamento automático: Titular &rarr; Reserva &rarr; Crítico no painel (192 / 193 / 199).
-                </div>
-                <div class="col-md-4 text-md-end d-flex flex-wrap gap-1 justify-content-md-end">
-                    <span class="ods-badge">ODS 3</span>
-                    <span class="ods-badge">ODS 11</span>
-                    <span class="ods-badge">ODS 13</span>
-                </div>
-            </div>
-        </div>
-    </footer>
+  <h2 class="h5">Alertas cadastrados</h2>
+  <div id="listaAlertas" class="mb-5"></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/api.js"></script>
-    <script src="js/motion.js"></script>
-    <script src="js/alertas.js"></script>
+  <h2 class="h4">Regiões</h2>
+  <form id="formRegiao" class="card card-body mb-3" novalidate>
+    <h3 id="tituloRegiao" class="h6">Nova região</h3>
+    <input type="hidden" name="id">
+    <div class="row g-3">
+      <div class="col-12 col-md-4"><label class="form-label" for="nomeRegiao">Nome (bairro, condomínio) *</label>
+        <input class="form-control" id="nomeRegiao" name="nome" maxlength="80"></div>
+      <div class="col-8 col-md-4"><label class="form-label" for="cidade">Cidade *</label>
+        <input class="form-control" id="cidade" name="cidade" maxlength="80"></div>
+      <div class="col-4 col-md-1"><label class="form-label" for="uf">UF *</label>
+        <input class="form-control" id="uf" name="uf" maxlength="2"></div>
+      <div class="col-6 col-md-3"><label class="form-label" for="latitude">Latitude</label>
+        <input class="form-control" id="latitude" name="latitude" inputmode="decimal" placeholder="-23.589"></div>
+      <div class="col-6 col-md-3"><label class="form-label" for="longitude">Longitude</label>
+        <input class="form-control" id="longitude" name="longitude" inputmode="decimal" placeholder="-46.634"></div>
+    </div>
+    <div class="d-flex gap-2 mt-3">
+      <button class="btn btn-primary" type="submit">Salvar região</button>
+      <button class="btn btn-outline-secondary" type="button" id="limparRegiao">Limpar</button>
+    </div>
+  </form>
+  <div id="listaRegioes"></div>
+</main>
+
+<script src="lib/bootstrap.bundle.min.js"></script>
+<script src="app.js"></script>
+<script>
+function mostrarInmet(r) {
+  const el = document.getElementById('inmetStatus');
+  if (!r.consultadoEm) { el.textContent = r.mensagem; return; }
+  el.innerHTML = `<strong>Última consulta: ${esc(r.consultadoEm)}.</strong> ${esc(r.mensagem)}` + (r.regioes.length
+    ? `<ul>${r.regioes.map((t, i) => `<li><a href="index.html?alerta=${r.alertas[i]}">${esc(t)}</a></li>`).join('')}</ul>` : '');
+}
+tentar(() => api('inmet')).then(r => r && mostrarInmet(r));
+document.getElementById('consultarInmet').addEventListener('click', async e => {
+  const b = e.currentTarget;
+  b.disabled = true;
+  b.textContent = 'Consultando o Inmet';
+  const r = await tentar(() => api('inmet', {}));
+  b.disabled = false;
+  b.textContent = 'Consultar o Inmet agora';
+  if (r) { mostrarInmet(r); carregar(); }
+});
+
+const formAlerta = document.getElementById('formAlerta'), formRegiao = document.getElementById('formRegiao'), formSensor = document.getElementById('formSensor');
+const NIVEL = { OBSERVACAO: 'Observação', ATENCAO: 'Atenção', ALERTA: 'Alerta', MAXIMO: 'Máximo' };
+const ORIGEM = { INMET: 'Inmet', DEFESA_CIVIL: 'Defesa Civil', OPEN_METEO: 'Open-Meteo', FLOODGUARD: 'Sensor FloodGuard', MANUAL: 'Manual' };
+let alertas = [], regioes = [];
+
+async function carregar() {
+  regioes = await tentar(() => api('regioes'));
+  if (!regioes) return;
+  alertas = await api('alertas');
+  const nomeRegiao = id => (regioes.find(r => r.id === id) || {}).nome || '';
+  const sel = formAlerta.elements.idRegiao.value;
+  opcoes(formAlerta.elements.idRegiao, regioes, 'id', r => `${r.nome} (${r.cidade})`, 'Escolha...');
+  const selSensor = formSensor.elements.idRegiao.value;
+  opcoes(formSensor.elements.idRegiao, regioes, 'id', r => `${r.nome} (${r.cidade})`, 'Escolha...');
+  formSensor.elements.idRegiao.value = selSensor;
+  formAlerta.elements.idRegiao.value = sel;
+
+  document.getElementById('listaAlertas').innerHTML = alertas.length ? `<div class="table-responsive"><table class="table table-striped align-middle">
+    <thead><tr><th>Data</th><th>Tipo</th><th>Região</th><th>Nível</th><th>Máx.</th><th>Origem</th><th>Ações</th></tr></thead><tbody>
+    ${alertas.map(a => `<tr><td>${dataBr(a.dataAlerta)}</td><td>${a.tipo === 'CALOR' ? 'Calor' : 'Chuva'}</td><td>${esc(nomeRegiao(a.idRegiao))}</td>
+      <td>${NIVEL[a.nivel]}</td><td>${a.tempMax != null ? String(a.tempMax).replace('.', ',') + ' °C' : '-'}</td><td>${esc(ORIGEM[a.origem] || a.origem)}</td>
+      <td class="text-nowrap"><button class="btn btn-sm btn-success" onclick="gerarRodada(${a.id})">Gerar rodada</button>
+        <a class="btn btn-sm btn-outline-dark" href="index.html?alerta=${a.id}">Ver no painel</a>
+        <button class="btn btn-sm btn-outline-primary" onclick="editarAlerta(${a.id})">Editar</button>
+        <button class="btn btn-sm btn-outline-danger" onclick="excluirAlerta(${a.id}, this)">Excluir</button></td></tr>`).join('')}
+    </tbody></table></div>` : '<p>Nenhum alerta.</p>';
+
+  document.getElementById('listaRegioes').innerHTML = `<div class="table-responsive"><table class="table table-striped align-middle">
+    <thead><tr><th>Nome</th><th>Cidade</th><th>UF</th><th>Coordenadas</th><th>Ações</th></tr></thead><tbody>
+    ${regioes.map(r => `<tr><td>${esc(r.nome)}</td><td>${esc(r.cidade)}</td><td>${esc(r.uf)}</td>
+      <td>${r.latitude != null ? esc(r.latitude) + ', ' + esc(r.longitude) : '-'}</td>
+      <td class="text-nowrap"><button class="btn btn-sm btn-outline-primary" onclick="editarRegiao(${r.id})">Editar</button>
+      <button class="btn btn-sm btn-outline-danger" onclick="excluirRegiao(${r.id})">Excluir</button></td></tr>`).join('')}
+    </tbody></table></div>`;
+}
+
+function limparAlerta() {
+  formAlerta.reset();
+  formAlerta.elements.id.value = '';
+  formAlerta.elements.dataAlerta.value = hoje();
+  document.getElementById('tituloAlerta').textContent = 'Novo alerta';
+  limparErros(formAlerta);
+}
+
+function editarAlerta(id) {
+  preencherForm(formAlerta, alertas.find(a => a.id === id));
+  document.getElementById('tituloAlerta').textContent = 'Editando alerta';
+  formAlerta.scrollIntoView({ behavior: 'smooth' });
+}
+
+async function excluirAlerta(id, botao) {
+  if (botao.dataset.confirmar !== 'sim') {
+    botao.dataset.confirmar = 'sim';
+    botao.textContent = 'Confirmar?';
+    return;
+  }
+  if (await tentar(() => api('alertas/excluir', { id }), 'Alerta excluído.') !== undefined) carregar();
+}
+
+async function gerarRodada(id) {
+  const r = await tentar(() => api('rodada', { id }));
+  if (r) avisar(r.criadas ? `${r.criadas} ligações criadas. Abra o Painel do dia.` : 'A rodada já estava gerada para todos os titulares.');
+}
+
+function validarAlerta(d) {
+  limparErros(formAlerta);
+  let ok = true;
+  if (!d.idRegiao) ok = erroCampo(formAlerta, 'idRegiao', 'Escolha a região.');
+  if (!d.dataAlerta) ok = erroCampo(formAlerta, 'dataAlerta', 'Informe a data.');
+  d.tempMax = d.tempMax.replace(',', '.');
+  if (d.tempMax && (isNaN(d.tempMax) || d.tempMax < -10 || d.tempMax > 60)) ok = erroCampo(formAlerta, 'tempMax', 'Temperatura entre -10 e 60 °C.');
+  if (d.tipo === 'CALOR' && !d.tempMax && d.origem === 'OPEN_METEO') ok = erroCampo(formAlerta, 'tempMax', 'Use a sugestão ou digite a temperatura.');
+  return ok;
+}
+
+formAlerta.addEventListener('submit', async e => {
+  e.preventDefault();
+  const d = dadosForm(formAlerta);
+  if (!validarAlerta(d)) return;
+  const r = await tentar(() => api('alertas', d), d.id ? 'Alerta atualizado.' : 'Alerta cadastrado. Agora clique em "Gerar rodada".');
+  if (r) { limparAlerta(); carregar(); }
+});
+
+document.getElementById('sugerir').addEventListener('click', async () => {
+  const d = dadosForm(formAlerta);
+  limparErros(formAlerta);
+  if (d.tipo !== 'CALOR') return avisar('A sugestão automática é só para calor. Para chuva, use o aviso da Defesa Civil.', 'info');
+  if (!d.idRegiao) return erroCampo(formAlerta, 'idRegiao', 'Escolha a região.');
+  const r = await tentar(() => api(`previsao?regiao=${d.idRegiao}&data=${d.dataAlerta}`));
+  if (!r) return;
+  formAlerta.elements.tempMax.value = r.tempMax;
+  if (r.nivelSugerido) {
+    formAlerta.elements.nivel.value = r.nivelSugerido;
+    if (!formAlerta.elements.fonteAviso.value) formAlerta.elements.origem.value = 'OPEN_METEO';
+    avisar(`Previsão de máxima ${r.tempMax} °C: nível sugerido ${NIVEL[r.nivelSugerido]}. Confira o aviso oficial.`, 'warning');
+  } else {
+    avisar(`Previsão de máxima ${r.tempMax} °C: abaixo de 30 °C, a régua do grupo não sugere alerta.`, 'info');
+  }
+});
+
+formSensor.addEventListener('submit', async e => {
+  e.preventDefault();
+  limparErros(formSensor);
+  const d = dadosForm(formSensor);
+  let ok = true;
+  if (!d.idRegiao) ok = erroCampo(formSensor, 'idRegiao', 'Escolha a região.');
+  if (!/^\d{1,3}$/.test(d.percentual) || d.percentual > 200) ok = erroCampo(formSensor, 'percentual', 'Número inteiro de 0 a 200.');
+  if (!ok) return;
+  const r = await tentar(() => api('sensor', d));
+  if (!r) return;
+  if (!r.idAlerta) return avisar(r.mensagem, 'info');
+  document.getElementById('avisos').innerHTML = `<div class="alert alert-warning" role="alert">${esc(r.mensagem)}
+    <a class="btn btn-primary btn-sm ms-2" href="index.html?alerta=${r.idAlerta}">Abrir no painel</a></div>`;
+  carregar();
+});
+
+function limparRegiao() {
+  formRegiao.reset();
+  formRegiao.elements.id.value = '';
+  document.getElementById('tituloRegiao').textContent = 'Nova região';
+  limparErros(formRegiao);
+}
+
+function editarRegiao(id) {
+  preencherForm(formRegiao, regioes.find(r => r.id === id));
+  document.getElementById('tituloRegiao').textContent = 'Editando região';
+  formRegiao.scrollIntoView({ behavior: 'smooth' });
+}
+
+async function excluirRegiao(id) {
+  if (await tentar(() => api('regioes/excluir', { id }), 'Região excluída.') !== undefined) carregar();
+}
+
+formRegiao.addEventListener('submit', async e => {
+  e.preventDefault();
+  limparErros(formRegiao);
+  const d = dadosForm(formRegiao);
+  d.uf = d.uf.toUpperCase();
+  d.latitude = d.latitude.replace(',', '.');
+  d.longitude = d.longitude.replace(',', '.');
+  let ok = true;
+  if (d.nome.length < 2) ok = erroCampo(formRegiao, 'nome', 'Informe o nome.');
+  if (d.cidade.length < 2) ok = erroCampo(formRegiao, 'cidade', 'Informe a cidade.');
+  if (!/^[A-Z]{2}$/.test(d.uf)) ok = erroCampo(formRegiao, 'uf', '2 letras.');
+  if (d.latitude && (isNaN(d.latitude) || Math.abs(d.latitude) > 90)) ok = erroCampo(formRegiao, 'latitude', 'Entre -90 e 90.');
+  if (d.longitude && (isNaN(d.longitude) || Math.abs(d.longitude) > 180)) ok = erroCampo(formRegiao, 'longitude', 'Entre -180 e 180.');
+  if (!ok) return;
+  const r = await tentar(() => api('regioes', d), d.id ? 'Região atualizada.' : 'Região cadastrada.');
+  if (r) { limparRegiao(); carregar(); }
+});
+
+document.getElementById('limparAlerta').addEventListener('click', limparAlerta);
+document.getElementById('limparRegiao').addEventListener('click', limparRegiao);
+limparAlerta();
+carregar();
+</script>
 </body>
 </html>

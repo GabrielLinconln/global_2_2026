@@ -1,270 +1,604 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel — Plantão Clima</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
-    <link href="css/styles.css" rel="stylesheet">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Painel do dia - Plantão Clima</title>
+  <link rel="preload" href="lib/fonts/atkinson-next.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="lib/bootstrap.min.css">
+  <link rel="stylesheet" href="lib/leaflet/leaflet.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-lg pc-navbar sticky-top" aria-label="Navegação principal">
-            <div class="container">
-                <a class="navbar-brand" href="index.html">
-                    <span class="brand-dot" aria-hidden="true"></span>
-                    <span>Plantão Clima</span>
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Abrir menu">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="mainNav">
-                    <ul class="navbar-nav me-auto ms-lg-4">
-                        <li class="nav-item"><a class="nav-link active" href="index.html">Painel</a></li>
-                        <li class="nav-item"><a class="nav-link" href="idosos.html">Idosos</a></li>
-                        <li class="nav-item"><a class="nav-link" href="voluntarios.html">Voluntários e Vínculos</a></li>
-                        <li class="nav-item"><a class="nav-link" href="alertas.html">Alertas e Rodada</a></li>
-                        <li class="nav-item"><a class="nav-link" href="relatorios.html">Relatórios</a></li>
-                    </ul>
-                    <span id="connectionStatus" class="connection-pill offline my-2 my-lg-0">Conectando...</span>
-                </div>
-            </div>
-        </nav>
-    </header>
+<div id="menu"></div>
 
-    <section class="pc-page-header">
-        <div class="container">
-            <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
-                <div>
-                    <div class="pc-kicker">Coordenação Comunitária · El Niño 2026</div>
-                    <h1>Painel de Monitoramento</h1>
-                    <p>Acompanhamento telefônico de idosos que moram sozinhos durante alertas de calor extremo e chuva forte.</p>
-                </div>
-                <div class="d-flex flex-wrap gap-2">
-                    <a href="idosos.html" class="btn btn-paper">Cadastrar idoso</a>
-                    <a href="alertas.html" class="btn btn-ink">Abrir rodada de ligações</a>
-                </div>
-            </div>
+<main class="pb-5">
+  <section class="visao no-print" aria-labelledby="tituloVisao">
+    <div class="container">
+      <div class="visao-topo">
+        <div>
+          <h1 id="tituloVisao">Painel do dia</h1>
+          <p id="resumo" class="resumo">Carregando os alertas.</p>
+          <p id="alarme" class="alarme d-none"></p>
         </div>
-    </section>
-
-    <main class="container">
-        <div id="feedbackPainel" class="feedback-zone"></div>
-
-        <!-- Ocorrências Críticas no Topo -->
-        <section id="secCriticos" class="mb-4 d-none" aria-label="Casos Críticos e Emergências">
-            <div class="critical-box">
-                <div class="critical-box-head">
-                    <div>
-                        <div class="critical-box-title d-flex align-items-center gap-2">
-                            <span class="critical-radar" aria-hidden="true"></span>
-                            <span>Casos críticos — ação presencial imediata</span>
-                        </div>
-                        <div class="small text-secondary">Titular e reserva não conseguiram contato ou foi solicitada ajuda. Envie alguém ao local e acione:</div>
-                    </div>
-                    <div class="d-flex flex-wrap gap-2">
-                        <a href="tel:192" class="emerg-link">SAMU 192</a>
-                        <a href="tel:193" class="emerg-link">Bombeiros 193</a>
-                        <a href="tel:199" class="emerg-link">Defesa Civil 199</a>
-                    </div>
-                </div>
-                <div id="listaCriticos"></div>
-            </div>
-        </section>
-
-        <!-- Monitor Animado de Fluxo Climático e Escalonamento -->
-        <section class="pc-card mb-4" aria-label="Monitor animado de protocolo climático">
-            <div class="pc-card-header">
-                <div class="d-flex flex-wrap align-items-center gap-2">
-                    <span>Protocolo ao vivo</span>
-                    <div class="mode-switch" role="group" aria-label="Alternar simulação de clima">
-                        <button type="button" id="btnModoCalor" class="mode-btn is-active">CALOR</button>
-                        <button type="button" id="btnModoChuva" class="mode-btn">CHUVA</button>
-                    </div>
-                </div>
-                <div class="d-flex align-items-center gap-2">
-                    <span id="motionCriterio" class="mono small text-muted d-none d-md-inline"></span>
-                    <button type="button" id="btnSimularFluxo" class="btn btn-sm btn-paper">Simular escalonamento</button>
-                </div>
-            </div>
-            <div id="climateStage" class="motion-stage" data-mode="CALOR">
-                <svg class="motion-bg-svg" viewBox="0 0 900 180" preserveAspectRatio="none" aria-hidden="true">
-                    <!-- Animação sutil de calor (ondas térmicas concêntricas) -->
-                    <g class="heat-layer" fill="none" stroke="#18181b">
-                        <circle class="heat-ring r1" cx="760" cy="48" r="34" stroke-width="1" stroke-opacity="0.14"/>
-                        <circle class="heat-ring r2" cx="760" cy="48" r="34" stroke-width="1" stroke-opacity="0.14"/>
-                        <circle class="heat-ring r3" cx="760" cy="48" r="34" stroke-width="1" stroke-opacity="0.14"/>
-                        <path class="heat-shimmer" d="M 0 152 Q 150 138 300 152 T 600 152 T 900 152" stroke-width="1" stroke-opacity="0.09"/>
-                        <path class="heat-shimmer" d="M 0 166 Q 150 154 300 166 T 600 166 T 900 166" stroke-width="1" stroke-opacity="0.06"/>
-                    </g>
-                    <!-- Animação sutil de chuva + onda d'água (FloodGuard) -->
-                    <g class="rain-layer" fill="none" stroke="#18181b">
-                        <line class="rain-drop" x1="80" y1="0" x2="55" y2="180" stroke-width="1" stroke-opacity="0.11"/>
-                        <line class="rain-drop d2" x1="190" y1="0" x2="165" y2="180" stroke-width="1" stroke-opacity="0.11"/>
-                        <line class="rain-drop d3" x1="310" y1="0" x2="285" y2="180" stroke-width="1" stroke-opacity="0.10"/>
-                        <line class="rain-drop" x1="440" y1="0" x2="415" y2="180" stroke-width="1" stroke-opacity="0.11"/>
-                        <line class="rain-drop d2" x1="580" y1="0" x2="555" y2="180" stroke-width="1" stroke-opacity="0.10"/>
-                        <line class="rain-drop d3" x1="710" y1="0" x2="685" y2="180" stroke-width="1" stroke-opacity="0.11"/>
-                        <line class="rain-drop" x1="835" y1="0" x2="810" y2="180" stroke-width="1" stroke-opacity="0.10"/>
-                        <path class="water-wave-path" d="M 0 162 Q 30 154 60 162 T 120 162 T 180 162 T 240 162 T 300 162 T 360 162 T 420 162 T 480 162 T 540 162 T 600 162 T 660 162 T 720 162 T 780 162 T 840 162 T 900 162 T 960 162 T 1020 162" stroke-width="1.2" stroke-opacity="0.16"/>
-                    </g>
-                </svg>
-
-                <div class="motion-content">
-                    <div class="flow-track">
-                        <div id="flowNode1" class="flow-node is-done">
-                            <div class="flow-node-step">01 · Gatilho</div>
-                            <div class="flow-node-title">Alerta Climático</div>
-                            <div id="nodeAlertaSub" class="flow-node-sub">INMET · Onda de Calor</div>
-                        </div>
-                        <svg id="flowWire1" class="flow-wire is-flowing" viewBox="0 0 28 16"><line x1="0" y1="8" x2="28" y2="8"/></svg>
-
-                        <div id="flowNode2" class="flow-node is-done">
-                            <div class="flow-node-step">02 · 1ª Tentativa</div>
-                            <div class="flow-node-title">Voluntário Titular</div>
-                            <div class="flow-node-sub">Liga pelo celular comum</div>
-                        </div>
-                        <svg id="flowWire2" class="flow-wire is-flowing" viewBox="0 0 28 16"><line x1="0" y1="8" x2="28" y2="8"/></svg>
-
-                        <div id="flowNode3" class="flow-node is-done">
-                            <div class="flow-node-step">03 · Backup</div>
-                            <div class="flow-node-title">Voluntário Reserva</div>
-                            <div class="flow-node-sub">Assume se não atender</div>
-                        </div>
-                        <svg id="flowWire3" class="flow-wire is-flowing" viewBox="0 0 28 16"><line x1="0" y1="8" x2="28" y2="8"/></svg>
-
-                        <div id="flowNode4" class="flow-node is-active is-critical-step">
-                            <div class="flow-node-step">04 · Sem Resposta</div>
-                            <div class="flow-node-title">Crítico no Painel</div>
-                            <div class="flow-node-sub">Visita + 192 / 193 / 199</div>
-                        </div>
-                    </div>
-                    <div id="motionStatusText" class="mono small text-secondary mt-3"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Faixa única de indicadores operacionais -->
-        <section class="metrics-strip mb-4" aria-label="Indicadores da operação">
-            <div class="metric-cell">
-                <div class="metric-label">Idosos ativos</div>
-                <div class="metric-num" id="kpiIdosos">—</div>
-                <div class="metric-note">Morando sozinhos</div>
-            </div>
-            <div class="metric-cell">
-                <div class="metric-label">Voluntários</div>
-                <div class="metric-num" id="kpiVoluntarios">—</div>
-                <div class="metric-note">Rede de confiança</div>
-            </div>
-            <div class="metric-cell">
-                <div class="metric-label">Checados &le; 4h</div>
-                <div class="metric-num" id="kpiCobertura4h">—</div>
-                <div class="metric-note">Último alerta</div>
-            </div>
-            <div class="metric-cell">
-                <div class="metric-label">Pendentes</div>
-                <div class="metric-num" id="kpiPendentes">—</div>
-                <div class="metric-note">Aguardando ligação</div>
-            </div>
-            <div class="metric-cell">
-                <div class="metric-label">Críticos</div>
-                <div class="metric-num is-danger" id="kpiCriticos">—</div>
-                <div class="metric-note">Escalonados</div>
-            </div>
-            <div class="metric-cell">
-                <div class="metric-label">Sem backup</div>
-                <div class="metric-num" id="kpiRedeIncompleta">—</div>
-                <div class="metric-note">Rede incompleta</div>
-            </div>
-        </section>
-
-        <!-- Alertas Ativos + Mapa Territorial (FloodGuard) -->
-        <div class="row g-4 mb-4">
-            <section class="col-lg-5" aria-label="Alertas Climáticos">
-                <div class="pc-card h-100">
-                    <div class="pc-card-header">
-                        <span>Alertas climáticos recentes</span>
-                        <a href="alertas.html" class="small text-decoration-none fw-semibold text-dark">Ver todos &rarr;</a>
-                    </div>
-                    <div id="listaAlertasPainel">
-                        <div class="p-4 text-center text-muted small">Carregando alertas...</div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="col-lg-7" aria-label="Mapa de Risco por Região">
-                <div class="pc-card h-100">
-                    <div class="pc-card-header">
-                        <span>Situação por região <span class="text-muted fw-normal">(módulo FloodGuard)</span></span>
-                        <span class="small text-muted">Clique para resumo UBS</span>
-                    </div>
-                    <div class="p-3">
-                        <div id="mapaRegioes" class="region-grid"></div>
-                        <div class="d-flex flex-wrap gap-3 mt-3 pt-2 border-top small text-muted">
-                            <span><strong class="text-danger">|</strong> Crítico / ajuda</span>
-                            <span><strong>·</strong> Clique em uma região para ver totais anonimizados</span>
-                        </div>
-                    </div>
-                </div>
-            </section>
+        <div class="visao-acoes">
+          <span id="hora" class="hora"></span>
+          <button id="atualizar" type="button" class="btn btn-outline-dark">Atualizar</button>
         </div>
+      </div>
 
-        <!-- Nota operacional concisa -->
-        <section class="pc-card p-3 mb-4" aria-label="Protocolo da rede">
-            <div class="row g-3 small text-secondary align-items-center">
-                <div class="col-md-9">
-                    <strong class="text-dark">Protocolo de atendimento:</strong>
-                    o idoso não instala aplicativo — apenas atende a ligação de um vizinho, familiar ou agente de saúde.
-                    Se o titular não conseguir contato, a fila transfere para o reserva; sem resposta de ambos, o caso sobe ao topo deste painel.
-                    Dados enviados à UBS e Defesa Civil são sempre agregados, sem nomes.
-                </div>
-                <div class="col-md-3 text-md-end">
-                    <a href="relatorios.html" class="btn btn-paper btn-sm">Abrir relatórios SQL</a>
-                </div>
-            </div>
+      <div class="controle">
+        <section class="cartoes" aria-labelledby="tituloCartoes">
+          <h2 id="tituloCartoes" class="subtitulo">Alertas por região</h2>
+          <div id="semAlerta" class="alert alert-info d-none">Nenhum alerta agora. Quando o Inmet, a Defesa Civil ou o sensor avisar, a rodada de ligações aparece aqui. Para cadastrar um aviso, use <a href="alertas.html">Alertas e regiões</a>.</div>
+          <ul id="cartoes" class="cartoes-lista"></ul>
+          <p id="calmas" class="calmas d-none"></p>
+          <details id="anteriores" class="anteriores d-none"><summary></summary><ul></ul></details>
         </section>
-    </main>
 
-    <!-- Modal Detalhe da Região -->
-    <div class="modal fade" id="modalRegiao" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="modalRegiaoTitulo">Detalhes da Região</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                </div>
-                <div class="modal-body" id="modalRegiaoCorpo"></div>
-                <div class="modal-footer">
-                    <a href="relatorios.html" class="btn btn-paper btn-sm">Relatório agregado UBS</a>
-                    <button type="button" class="btn btn-ink btn-sm" data-bs-dismiss="modal">Fechar</button>
-                </div>
+        <section class="mapa-area" aria-labelledby="tituloMapa">
+          <div class="mapa-topo">
+            <h2 id="tituloMapa" class="subtitulo">Mapa</h2>
+            <div class="btn-group camadas" role="group" aria-label="O que o mapa mostra">
+              <input type="radio" class="btn-check" name="camada" id="camAvisos" value="avisos" checked>
+              <label class="btn btn-outline-dark" for="camAvisos">Avisos</label>
+              <input type="radio" class="btn-check" name="camada" id="camTemp" value="temp" disabled>
+              <label class="btn btn-outline-dark" for="camTemp">Temperatura</label>
+              <input type="radio" class="btn-check" name="camada" id="camChuva" value="chuva" disabled>
+              <label class="btn btn-outline-dark" for="camChuva">Chuva</label>
             </div>
+          </div>
+          <div id="mapa" class="mapa" role="region" aria-label="Mapa das regiões. A lista de alertas tem as mesmas informações."></div>
+          <div id="legendaMapa" class="legenda-mapa"></div>
+          <p id="notaMapa" class="nota-mapa"></p>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <section id="faixa" class="faixa no-print d-none" aria-labelledby="titulo">
+    <div class="container">
+      <div id="avisos"></div>
+      <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
+        <div>
+          <span id="nivel" class="nivel"></span>
+          <h2 id="titulo" class="titulo" tabindex="-1">Rodada de ligações</h2>
+          <p id="fonte" class="fonte"></p>
         </div>
+        <div class="d-flex flex-wrap gap-2">
+          <a href="#tituloVisao" class="btn btn-faixa">Ver todos os alertas</a>
+          <button type="button" onclick="window.print()" class="btn btn-faixa">Imprimir lista</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    <div id="conteudo" class="tela d-none">
+      <section class="placar" aria-labelledby="tituloPlacar">
+        <h2 id="tituloPlacar">Rodada de ligações</h2>
+        <div id="fita" class="fita"></div>
+        <ul id="legenda" class="legenda"></ul>
+        <ol id="protocolo" class="protocolo" aria-label="Como a rodada anda"></ol>
+      </section>
+
+      <section id="secaoCriticos" class="d-none" aria-live="polite" aria-labelledby="tituloCriticos">
+        <div class="secao-titulo perigo">
+          <h2 id="tituloCriticos">Ninguém conseguiu falar</h2>
+          <p class="m-0">Ninguém conseguiu falar com estas pessoas. Peça para alguém ir até a casa agora.</p>
+        </div>
+        <div id="criticos"></div>
+      </section>
+
+      <section aria-labelledby="tituloLigacoes">
+        <div class="secao-titulo">
+          <h2 id="tituloLigacoes">Ligações</h2>
+          <div class="d-flex flex-wrap gap-3 align-items-end">
+            <div>
+              <label for="filtro" class="form-label">Ver ligações de</label>
+              <select id="filtro" class="form-select"></select>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="checkbox" id="depois">
+              <label class="form-check-label" for="depois">Estou passando para o sistema ligações anotadas no papel</label>
+            </div>
+          </div>
+        </div>
+        <div id="rodada" class="row g-3"></div>
+      </section>
     </div>
 
-    <footer class="pc-footer py-4">
-        <div class="container">
-            <div class="row g-2 align-items-center">
-                <div class="col-md-8">
-                    <strong class="text-dark">Plantão Clima</strong> · Global Solution 2026/2 (FIAP 2ESOA).
-                    Complementa a orientação oficial e <strong>não substitui</strong> SAMU 192, Bombeiros 193 ou Defesa Civil 199.
-                </div>
-                <div class="col-md-4 text-md-end d-flex flex-wrap gap-1 justify-content-md-end">
-                    <span class="ods-badge">ODS 3</span>
-                    <span class="ods-badge">ODS 11</span>
-                    <span class="ods-badge">ODS 13</span>
-                </div>
-            </div>
-        </div>
-    </footer>
+    <div id="impressao" class="so-impressao"></div>
+  </div>
+</main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/api.js"></script>
-    <script src="js/motion.js"></script>
-    <script src="js/painel.js"></script>
+<script src="lib/bootstrap.bundle.min.js"></script>
+<script src="lib/leaflet/leaflet.js"></script>
+<script src="app.js"></script>
+<script>
+const CHECKLIST = {
+  CALOR: ['Beber água aos poucos, mesmo sem sede.', 'Ficar em lugar fresco e na sombra; evitar sol das 10h às 16h.', 'Roupas leves e janelas abertas para ventilar.',
+          'Sinais de alerta: tontura, dor de cabeça, fraqueza, náusea, confusão, desmaio, coração acelerado. Se tiver algum: ligue 192.'],
+  CHUVA: ['Está em lugar seguro, longe de encosta e córrego?', 'Água entrando em casa, rachadura nova ou estalos nas paredes? Saia e ligue 199 ou 193.',
+          'Se a água entrar, desligue a energia elétrica.', 'Tem para onde ir (vizinho, familiar) se precisar sair?']
+};
+const FONTE = { CALOR: 'Orientações do Alerta Nº 01/2025 da Secretaria de Estado da Saúde de SP.', CHUVA: 'Orientações da Defesa Civil para chuvas fortes.' };
+const NIVEL = { OBSERVACAO: 'Observação', ATENCAO: 'Nível de atenção', ALERTA: 'Nível de alerta', MAXIMO: 'Nível máximo' };
+const ORIGEM = { INMET: 'Inmet', DEFESA_CIVIL: 'Defesa Civil', OPEN_METEO: 'previsão Open-Meteo', FLOODGUARD: 'sensor FloodGuard', MANUAL: 'cadastro manual' };
+// situacao de cada idoso na rodada (a fita, a legenda e os cartoes usam a mesma)
+const SITUACAO = {
+  PENDENTE: 'Aguardando ligação', RESERVA: 'Com o reserva', OK: 'Está bem',
+  ATENCAO: 'Precisa de atenção', URGENTE: 'Precisa de ajuda', CRITICO: 'Ninguém atendeu'
+};
+// do mais leve ao mais grave; o mapa pinta a regiao pelo alerta mais grave dela
+const GRAVIDADE = ['OBSERVACAO', 'ATENCAO', 'ALERTA', 'MAXIMO'];
+const NO_RESUMO = { MAXIMO: 'no nível máximo', ALERTA: 'de alerta', ATENCAO: 'de atenção', OBSERVACAO: 'de observação' };
+// cores e nomes oficiais dos avisos do Inmet
+const SEVERIDADE = { 'Perigo Potencial': 'ATENCAO', 'Perigo': 'ALERTA', 'Grande Perigo': 'MAXIMO' };
+const COR_INMET = { OBSERVACAO: 'observação', ATENCAO: 'amarelo, perigo potencial', ALERTA: 'laranja, perigo', MAXIMO: 'vermelho, grande perigo' };
+// escalas sequenciais (amarelo-vermelho e azuis), legiveis para daltonicos
+const RAMPA = {
+  temp: ['#FFF3B0', '#FED976', '#FEB24C', '#FD8D3C', '#FC4E2A', '#E31A1C', '#B10026'],
+  chuva: ['#F1F7FD', '#D0E3F5', '#A6CBE8', '#6FA8D6', '#3F86C2', '#1C62A8', '#0B3F7F']
+};
+const GRADE = 9; // pontos por lado da grade da Open-Meteo
+let painel = null, paineis = [], anteriores = [], regioes = [], clima = null, primeiraVez = true;
+let mapa = null, pinos, halos, areas, imagemCalor = null, enquadrado = false;
+
+const nomeRegiao = id => (regioes.find(r => r.id === id) || {}).nome || '';
+const temCoord = r => r.latitude != null && r.longitude != null;
+const num = v => Number(v).toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+
+async function carregar(idAlerta) {
+  const alertas = await tentar(() => api('alertas'));
+  if (!alertas) {
+    document.getElementById('resumo').textContent = 'Servidor desligado. Inicie o sistema (App.java) e recarregue a página.';
+    return;
+  }
+  regioes = await api('regioes');
+  // cada regiao mostra o alerta do dia mais recente dela (a lista vem da data mais nova para a mais antiga)
+  const ultimo = {};
+  for (const a of alertas) if (!ultimo[a.idRegiao]) ultimo[a.idRegiao] = a.dataAlerta;
+  const atuais = alertas.filter(a => a.dataAlerta === ultimo[a.idRegiao]);
+  anteriores = alertas.filter(a => a.dataAlerta !== ultimo[a.idRegiao]);
+  paineis = (await Promise.all(atuais.map(a => api('painel?alerta=' + a.id))))
+    .sort((p, q) => GRAVIDADE.indexOf(q.alerta.nivel) - GRAVIDADE.indexOf(p.alerta.nivel) || resumir(q).semNoticia - resumir(p).semNoticia);
+  const id = Number(idAlerta) || (paineis[0] && paineis[0].alerta.id);
+  painel = paineis.find(p => p.alerta.id === id) || (id ? await tentar(() => api('painel?alerta=' + id)) : null) || paineis[0] || null;
+  desenharVisao();
+  desenharPinos();
+  document.getElementById('faixa').classList.toggle('d-none', !painel);
+  document.getElementById('conteudo').classList.toggle('d-none', !painel);
+  if (painel) desenhar(nomeRegiao(painel.alerta.idRegiao));
+}
+
+// ultima ligacao de cada idoso + situacao dele
+function porIdoso(p = painel) {
+  const criticos = new Set(p.criticos.map(c => c.id_idoso));
+  const mapa = new Map();
+  for (const l of p.rodada) {
+    const atual = mapa.get(l.idIdoso);
+    if (!atual || l.tentativa > atual.tentativa) mapa.set(l.idIdoso, l);
+  }
+  return [...mapa.values()].map(l => ({
+    ...l,
+    situacao: criticos.has(l.idIdoso) || l.resultado === 'NAO_ATENDEU' ? 'CRITICO'
+      : l.resultado === 'PENDENTE' && l.tentativa === 2 ? 'RESERVA' : l.resultado
+  }));
+}
+
+function resumir(p) {
+  const pessoas = porIdoso(p);
+  const conta = k => pessoas.filter(x => x.situacao === k).length;
+  const noticia = conta('OK') + conta('ATENCAO') + conta('URGENTE');
+  return { pessoas, total: pessoas.length, noticia, criticos: conta('CRITICO'), semNoticia: pessoas.length - noticia };
+}
+
+function plural(n, um, varios) {
+  return `${n} ${n === 1 ? um : varios}`;
+}
+
+// resumo do dia + um cartao por alerta (substitui o antigo seletor de alerta)
+function desenharVisao() {
+  const rs = paineis.map(resumir);
+  const soma = k => rs.reduce((s, x) => s + x[k], 0);
+  const nRegioes = new Set(paineis.map(p => p.alerta.idRegiao)).size;
+  const niveis = GRAVIDADE.slice().reverse().map(n => [n, paineis.filter(p => p.alerta.nivel === n).length]).filter(([, q]) => q);
+  document.getElementById('resumo').textContent = paineis.length
+    ? `${plural(paineis.length, 'alerta', 'alertas')} em ${plural(nRegioes, 'região', 'regiões')} (${niveis.map(([n, q]) => `${q} ${NO_RESUMO[n]}`).join(', ')}). `
+      + `${soma('noticia')} de ${plural(soma('total'), 'pessoa já deu', 'pessoas já deram')} notícia.`
+    : 'Nenhum alerta agora.';
+  const criticos = soma('criticos');
+  const alarme = document.getElementById('alarme');
+  alarme.classList.toggle('d-none', !criticos);
+  alarme.textContent = criticos ? `${plural(criticos, 'pessoa', 'pessoas')} sem resposta depois das ligações. Peça para alguém ir até a casa.` : '';
+  const agora = new Date();
+  document.getElementById('hora').textContent = agora.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })
+    + ', atualizado às ' + agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  document.getElementById('semAlerta').classList.toggle('d-none', paineis.length > 0);
+
+  document.getElementById('cartoes').innerHTML = paineis.map((p, k) => {
+    const a = p.alerta, r = rs[k], c = clima && clima.regiao[a.idRegiao];
+    return `<li><a class="alerta-cartao nivel-${a.nivel}" href="?alerta=${a.id}" data-id="${a.id}"${painel && a.id === painel.alerta.id ? ' aria-current="true"' : ''}>
+      <span class="cartao-topo"><strong class="cartao-regiao">${esc(nomeRegiao(a.idRegiao))}</strong><span class="selo nivel-${a.nivel}">${NIVEL[a.nivel]}</span></span>
+      <span class="cartao-meta">${a.tipo === 'CALOR' ? 'Calor extremo' : 'Chuva forte'}, ${a.dataAlerta === hoje() ? 'hoje' : dataBr(a.dataAlerta)}, ${esc(ORIGEM[a.origem] || a.origem)}</span>
+      ${r.total ? `<span class="mini-fita" aria-hidden="true">${r.pessoas.map(x => `<i class="s-${x.situacao}"></i>`).join('')}</span>
+      <span class="cartao-conta">${r.noticia} de ${r.total} deram notícia${r.criticos ? `, <b class="perigo">${r.criticos} sem resposta</b>` : ''}</span>`
+      : '<span class="cartao-conta">Rodada ainda não gerada</span>'}
+      ${c ? `<span class="cartao-clima">Previsão de hoje: máxima de ${num(c.temp)} °C, ${num(c.chuva)} mm de chuva</span>` : ''}
+    </a></li>`;
+  }).join('');
+
+  const calmas = regioes.filter(r => !paineis.some(p => p.alerta.idRegiao === r.id)).map(r => r.nome);
+  document.getElementById('calmas').classList.toggle('d-none', !calmas.length);
+  document.getElementById('calmas').textContent = `Sem alerta: ${calmas.join(', ')}.`;
+
+  const ant = document.getElementById('anteriores');
+  ant.classList.toggle('d-none', !anteriores.length);
+  ant.querySelector('summary').textContent = `Alertas anteriores (${anteriores.length})`;
+  ant.querySelector('ul').innerHTML = anteriores.map(a =>
+    `<li><a href="?alerta=${a.id}" data-id="${a.id}">${dataBr(a.dataAlerta)}, ${a.tipo === 'CALOR' ? 'calor' : 'chuva'} em ${esc(nomeRegiao(a.idRegiao))} (${NIVEL[a.nivel].toLowerCase()})</a></li>`).join('');
+}
+
+async function selecionar(id, rolar) {
+  const p = paineis.find(x => x.alerta.id === id);
+  if (p) {
+    painel = p;
+    desenharVisao();
+    desenharPinos();
+    desenhar(nomeRegiao(p.alerta.idRegiao));
+  } else {
+    await carregar(id);
+  }
+  history.replaceState(null, '', '?alerta=' + id);
+  if (rolar) {
+    document.getElementById('faixa').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    document.getElementById('titulo').focus({ preventScroll: true });
+  }
+}
+
+// ===== mapa: regioes, avisos do Inmet e previsao da Open-Meteo =====
+function iniciarMapa() {
+  mapa = L.map('mapa', { scrollWheelZoom: false });
+  // fundo cinza claro (sem chave de API) e nomes dos lugares por cima das camadas de dados
+  const esri = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_';
+  L.tileLayer(esri + 'Base/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 16, attribution: 'Mapa base &copy; Esri, HERE, Garmin, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  }).addTo(mapa);
+  mapa.createPane('calor').style.zIndex = 350; // abaixo das areas e dos pinos
+  mapa.createPane('nomes').style.zIndex = 450;
+  mapa.getPane('nomes').style.pointerEvents = 'none';
+  L.tileLayer(esri + 'Reference/MapServer/tile/{z}/{y}/{x}', { maxZoom: 16, pane: 'nomes', opacity: .55 }).addTo(mapa);
+  areas = L.layerGroup().addTo(mapa);
+  halos = L.layerGroup().addTo(mapa);
+  pinos = L.layerGroup().addTo(mapa);
+  mapa.on('mousemove', e => lerPonto(e.latlng));
+  mapa.on('mouseout', () => lerPonto());
+}
+
+function desenharPinos() {
+  if (!mapa) iniciarMapa();
+  const lista = regioes.filter(temCoord);
+  if (!enquadrado) {
+    if (lista.length > 1) mapa.fitBounds(L.latLngBounds(lista.map(r => [r.latitude, r.longitude])).pad(.2));
+    else mapa.setView(lista.length ? [lista[0].latitude, lista[0].longitude] : [-23.55, -46.63], 11);
+    enquadrado = true;
+  }
+  pinos.clearLayers();
+  halos.clearLayers();
+  for (const r of lista) {
+    const delas = paineis.filter(p => p.alerta.idRegiao === r.id);
+    const p = delas[0];
+    const falta = delas.reduce((s, d) => s + resumir(d).semNoticia, 0);
+    const ativa = painel && delas.some(d => d.alerta.id === painel.alerta.id);
+    const c = clima && clima.regiao[r.id];
+    const texto = (p ? `${r.nome}: ${NIVEL[p.alerta.nivel].toLowerCase()}, ${falta ? plural(falta, 'pessoa sem notícia', 'pessoas sem notícia') : 'todos deram notícia'}` : `${r.nome}: sem alerta`)
+      + (c ? `. Hoje: máxima de ${num(c.temp)} °C, ${num(c.chuva)} mm de chuva` : '');
+    const icone = L.divIcon({
+      className: 'pino-caixa' + (ativa ? ' ativa' : ''), iconSize: p ? [36, 36] : [16, 16],
+      html: `<span class="pino ${p ? 'nivel-' + p.alerta.nivel : 'sem'}">${p ? (falta || '✓') : ''}</span><span class="pino-nome">${esc(r.nome)}${delas.length > 1 ? ' +' + (delas.length - 1) : ''}</span>`
+    });
+    const m = L.marker([r.latitude, r.longitude], { icon: icone, keyboard: !!p, zIndexOffset: p ? 100 * GRAVIDADE.indexOf(p.alerta.nivel) : -100 })
+      .bindTooltip(esc(texto), { direction: 'top', offset: [0, p ? -20 : -10] }).addTo(pinos);
+    if (p) {
+      m.getElement().setAttribute('aria-label', texto);
+      m.on('click', () => selecionar(p.alerta.id, true));
+      m.on('keypress', e => { if (e.originalEvent.key === 'Enter') selecionar(p.alerta.id, true); });
+      L.circle([r.latitude, r.longitude], { radius: 2400, className: 'halo nivel-' + p.alerta.nivel, interactive: false }).addTo(halos);
+    }
+  }
+}
+
+// ponto dentro do poligono (GeoJSON usa [longitude, latitude])
+function dentro(lon, lat, anel) {
+  let d = false;
+  for (let i = 0, j = anel.length - 1; i < anel.length; j = i++) {
+    const [xi, yi] = anel[i], [xj, yj] = anel[j];
+    if ((yi > lat) !== (yj > lat) && lon < (xj - xi) * (lat - yi) / (yj - yi) + xi) d = !d;
+  }
+  return d;
+}
+
+// avisos ativos do Inmet que cobrem alguma regiao cadastrada
+async function desenharAvisos() {
+  if (!mapa) return;
+  const r = await api('inmet').catch(() => null);
+  areas.clearLayers();
+  const linhas = [];
+  for (const av of (r && r.avisos) || []) {
+    const geo = typeof av.poligono === 'string' ? JSON.parse(av.poligono) : av.poligono;
+    if (!geo || !geo.coordinates) continue;
+    const aneis = geo.type === 'MultiPolygon' ? geo.coordinates.map(p => p[0]) : [geo.coordinates[0]];
+    const cobertas = regioes.filter(temCoord).filter(g => aneis.some(a => dentro(g.longitude, g.latitude, a)));
+    if (!cobertas.length) continue;
+    const nivel = av.nivel || SEVERIDADE[av.severidade] || 'ATENCAO';
+    const quando = av.fim ? `, até ${dataBr(String(av.fim).replace(' ', 'T'))}` : '';
+    const texto = `Inmet: ${av.descricao}, aviso ${COR_INMET[nivel]}${quando}`;
+    L.geoJSON(geo, { style: { className: 'area nivel-' + nivel, weight: 2 } }).bindPopup(esc(texto)).addTo(areas);
+    linhas.push(`${texto}. Cobre ${cobertas.map(g => g.nome).join(', ')}.`);
+  }
+  document.getElementById('notaMapa').textContent = (linhas.length ? linhas.join(' ') + ' ' : r ? 'Nenhum aviso do Inmet sobre as regiões cadastradas. ' : '')
+    + 'Fontes: Inmet (avisos), Open-Meteo (previsão), Esri e OpenStreetMap (mapa).';
+}
+
+// grade de previsao de hoje sobre as regioes + um ponto em cada regiao, numa so chamada
+async function carregarClima() {
+  const lista = regioes.filter(temCoord);
+  if (!lista.length) return;
+  const lats = lista.map(r => r.latitude), lons = lista.map(r => r.longitude);
+  const caixa = [Math.min(...lats) - .15, Math.min(...lons) - .15, Math.max(...lats) + .15, Math.max(...lons) + .15];
+  const pts = [];
+  for (let i = 0; i < GRADE; i++) for (let j = 0; j < GRADE; j++)
+    pts.push([caixa[0] + (caixa[2] - caixa[0]) * i / (GRADE - 1), caixa[1] + (caixa[3] - caixa[1]) * j / (GRADE - 1)]);
+  lista.forEach(r => pts.push([r.latitude, r.longitude]));
+  const url = 'https://api.open-meteo.com/v1/forecast?latitude=' + pts.map(p => p[0].toFixed(3)).join(',')
+    + '&longitude=' + pts.map(p => p[1].toFixed(3)).join(',')
+    + '&daily=temperature_2m_max,precipitation_sum&timezone=America%2FSao_Paulo&forecast_days=1';
+  try {
+    const dados = await (await fetch(url, { signal: AbortSignal.timeout(10000) })).json();
+    const valor = d => ({ temp: d.daily.temperature_2m_max[0], chuva: d.daily.precipitation_sum[0] });
+    clima = { caixa, grade: dados.slice(0, GRADE * GRADE).map(valor), regiao: {} };
+    lista.forEach((r, k) => { clima.regiao[r.id] = valor(dados[GRADE * GRADE + k]); });
+  } catch (e) {
+    clima = null;
+  }
+  document.querySelectorAll('[name=camada]:not([value=avisos])').forEach(i => { i.disabled = !clima; });
+  desenharCamada();
+  desenharVisao();
+  desenharPinos();
+}
+
+// valor interpolado da grade num ponto (bilinear)
+function valorEm(lat, lon, campo) {
+  const [la0, lo0, la1, lo1] = clima.caixa, n = GRADE - 1;
+  const gi = (lat - la0) / (la1 - la0) * n, gj = (lon - lo0) / (lo1 - lo0) * n;
+  if (!(gi >= 0 && gj >= 0 && gi <= n && gj <= n)) return null;
+  const i = Math.min(n - 1, Math.floor(gi)), j = Math.min(n - 1, Math.floor(gj)), fi = gi - i, fj = gj - j;
+  const v = (a, b) => clima.grade[(i + a) * GRADE + j + b][campo];
+  return (v(0, 0) * (1 - fj) + v(0, 1) * fj) * (1 - fi) + (v(1, 0) * (1 - fj) + v(1, 1) * fj) * fi;
+}
+
+function imagemClima(campo) {
+  const vals = clima.grade.map(g => g[campo]);
+  let min = Math.min(...vals), max = Math.max(...vals);
+  // folga minima na escala: 1 grau de diferenca nao pode parecer um extremo
+  if (campo === 'temp' && max - min < 3) { const m = (min + max) / 2; min = m - 1.5; max = m + 1.5; }
+  if (campo === 'chuva') { min = 0; max = Math.max(10, max); }
+  const TAM = 100, tela = document.createElement('canvas');
+  tela.width = tela.height = TAM;
+  const ctx = tela.getContext('2d'), img = ctx.createImageData(TAM, TAM);
+  const [la0, lo0, la1, lo1] = clima.caixa;
+  const cores = RAMPA[campo].map(h => [1, 3, 5].map(k => parseInt(h.slice(k, k + 2), 16)));
+  for (let y = 0; y < TAM; y++) for (let x = 0; x < TAM; x++) {
+    const v = valorEm(la1 - (la1 - la0) * y / (TAM - 1), lo0 + (lo1 - lo0) * x / (TAM - 1), campo);
+    const t = Math.max(0, Math.min(1, (v - min) / (max - min))) * (cores.length - 1);
+    const a = cores[Math.floor(t)], b = cores[Math.min(cores.length - 1, Math.floor(t) + 1)], f = t - Math.floor(t);
+    const k = (y * TAM + x) * 4;
+    for (let c = 0; c < 3; c++) img.data[k + c] = a[c] + (b[c] - a[c]) * f;
+    img.data[k + 3] = 255;
+  }
+  ctx.putImageData(img, 0, 0);
+  return { url: tela.toDataURL(), min, max };
+}
+
+function camadaAtual() {
+  return document.querySelector('[name=camada]:checked').value;
+}
+
+function desenharCamada() {
+  const camada = camadaAtual();
+  document.getElementById('mapa').classList.toggle('so-contorno', camada !== 'avisos');
+  if (imagemCalor) { imagemCalor.remove(); imagemCalor = null; }
+  const leg = document.getElementById('legendaMapa');
+  if (camada === 'avisos' || !clima) {
+    leg.innerHTML = [['ATENCAO', 'Atenção'], ['ALERTA', 'Alerta'], ['MAXIMO', 'Máximo']].map(([n, t]) => `<span class="chave"><i class="nivel-${n}"></i>${t} (${COR_INMET[n]})</span>`).join('')
+      + '<span class="chave"><i class="pino-mini">3</i>pessoas sem notícia</span>'
+      + (clima ? '' : '<span class="chave">Previsão indisponível sem internet</span>');
+    return;
+  }
+  const im = imagemClima(camada), un = camada === 'temp' ? '°C' : 'mm';
+  imagemCalor = L.imageOverlay(im.url, [[clima.caixa[0], clima.caixa[1]], [clima.caixa[2], clima.caixa[3]]], { pane: 'calor', opacity: .62 }).addTo(mapa);
+  leg.innerHTML = `<span>${camada === 'temp' ? 'Máxima prevista para hoje' : 'Chuva prevista para hoje'}</span>
+    <span class="rampa-num">${num(im.min)}</span><span class="rampa" style="background: linear-gradient(90deg, ${RAMPA[camada].join(', ')})"></span><span class="rampa-num">${num(im.max)} ${un}</span>
+    <span id="leitura" class="leitura" aria-hidden="true"></span>`;
+}
+
+function lerPonto(ll) {
+  const el = document.getElementById('leitura');
+  if (!el) return;
+  const camada = camadaAtual();
+  const v = ll && clima ? valorEm(ll.lat, ll.lng, camada) : null;
+  el.textContent = v == null ? '' : `Neste ponto: ${num(v)} ${camada === 'temp' ? '°C' : 'mm'}`;
+}
+
+// ===== rodada do alerta escolhido =====
+function desenhar(regiao) {
+  const a = painel.alerta;
+  const calor = a.tipo === 'CALOR';
+  const faixa = document.getElementById('faixa');
+  faixa.className = 'faixa no-print nivel-' + a.nivel;
+  document.getElementById('nivel').textContent = NIVEL[a.nivel];
+  document.getElementById('titulo').textContent = `${calor ? 'Calor extremo' : 'Chuva forte'} em ${regiao}`
+    + (a.tempMax != null ? `, máxima de ${String(a.tempMax).replace('.', ',')} °C` : '');
+  document.getElementById('fonte').textContent = `Aviso de ${dataBr(a.dataAlerta)}, fonte ${ORIGEM[a.origem] || a.origem}` + (a.fonteAviso ? `: ${a.fonteAviso}` : '.');
+
+  const pessoas = porIdoso();
+  const conta = k => pessoas.filter(p => p.situacao === k).length;
+  const deramNoticia = conta('OK') + conta('ATENCAO') + conta('URGENTE');
+  document.getElementById('tituloPlacar').textContent = pessoas.length
+    ? `${deramNoticia} de ${plural(pessoas.length, 'pessoa já deu', 'pessoas já deram')} notícia`
+    : 'Rodada ainda não gerada';
+  const fita = document.getElementById('fita');
+  fita.classList.toggle('animar', primeiraVez);
+  primeiraVez = false;
+  fita.innerHTML = pessoas.map((p, i) =>
+    `<a href="#lig-${p.idIdoso}" class="s-${p.situacao}" style="--i:${i}" aria-label="${esc(p.idoso.nome)}: ${SITUACAO[p.situacao]}" title="${esc(p.idoso.nome)}: ${SITUACAO[p.situacao]}"></a>`).join('');
+  document.getElementById('legenda').innerHTML = Object.keys(SITUACAO).map(k =>
+    `<li><i class="s-${k}"></i>${SITUACAO[k]} <b>${conta(k)}</b></li>`).join('');
+
+  const n1 = conta('PENDENTE'), n2 = conta('RESERVA'), n3 = conta('CRITICO');
+  const passos = [
+    ['O titular liga', n1 ? `${plural(n1, 'pessoa aguardando', 'pessoas aguardando')}` : 'Nenhuma ligação na fila', n1, ''],
+    ['Sem resposta, o reserva liga', n2 ? `${plural(n2, 'pessoa com o reserva', 'pessoas com o reserva')}` : 'Ninguém com o reserva agora', n2, ''],
+    ['Ninguém atendeu: caso crítico', n3 ? `${plural(n3, 'caso crítico', 'casos críticos')}` : 'Nenhum caso crítico', n3, ' perigo'],
+    [`Visita ou ${calor ? '192' : '193, 199 ou 192'}`, n3 ? 'Mande alguém até a casa agora' : 'Nenhuma visita pendente', n3, ' perigo']
+  ];
+  document.getElementById('protocolo').innerHTML = passos.map(([t, s, n, cls]) =>
+    `<li class="${n ? 'ativo' + cls : ''}"><strong>${t}</strong><span>${s}</span></li>`).join('');
+
+  const crit = painel.criticos;
+  document.getElementById('secaoCriticos').classList.toggle('d-none', !crit.length);
+  document.getElementById('criticos').innerHTML = crit.map(i => `
+    <article class="critico">
+      <h3>${esc(i.nome)}</h3>
+      <p class="mb-1">Última tentativa ${dataBr(i.ultima_tentativa)}, ${minutos(i.ultima_tentativa)}.</p>
+      <p class="mb-1"><strong>Se ninguém abrir a porta, ligue 193 ou 192${calor ? '' : ' (ou 199, Defesa Civil)'}.</strong></p>
+      <p class="mb-3">Endereço: ${esc(i.endereco_ref || 'não informado')}. Família: ${esc(i.contato_familiar || 'não informado')}.</p>
+      <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-danger" href="tel:193">${ICONE_TEL} Ligar 193</a>
+        <a class="btn btn-danger" href="tel:192">${ICONE_TEL} Ligar 192</a>
+        ${i.telefone ? `<a class="btn btn-outline-dark" href="tel:${esc(i.telefone)}">Tentar celular</a>` : ''}
+        ${i.telefone_fixo ? `<a class="btn btn-outline-dark" href="tel:${esc(i.telefone_fixo)}">Tentar fixo</a>` : ''}
+        <button class="btn btn-success" onclick="visita(${i.id_checagem})">Alguém foi até a casa: está bem</button>
+      </div>
+    </article>`).join('');
+
+  const vols = [...new Map(painel.rodada.map(l => [l.idVoluntario, l.nomeVoluntario])).entries()];
+  const filtro = document.getElementById('filtro');
+  const sel = filtro.value;
+  filtro.innerHTML = '<option value="">Todos os voluntários</option>' + vols.map(([id, n]) => `<option value="${id}">${esc(n)}</option>`).join('');
+  filtro.value = vols.some(([id]) => String(id) === sel) ? sel : '';
+  desenharRodada();
+  desenharImpressao(regiao);
+}
+
+function minutos(iso) {
+  const m = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+  if (m < 60) return `há ${m} min`;
+  if (m < 1440) return `há ${Math.floor(m / 60)} h ${m % 60} min`;
+  return `há ${plural(Math.floor(m / 1440), 'dia', 'dias')}`;
+}
+
+function desenharRodada() {
+  if (!painel.rodada.length) {
+    document.getElementById('rodada').innerHTML = '<p class="col-12">Rodada ainda não gerada. Em <a href="alertas.html">Alertas e regiões</a>, clique em "Gerar rodada".</p>';
+    return;
+  }
+  const f = document.getElementById('filtro').value;
+  const tipo = painel.alerta.tipo;
+  // quem ainda precisa de ligacao vem primeiro; dentro de cada grupo vale a ordem de risco do servidor
+  const lista = porIdoso().filter(l => !f || String(l.idVoluntario) === f)
+    .sort((a, b) => ['PENDENTE', 'RESERVA'].includes(b.situacao) - ['PENDENTE', 'RESERVA'].includes(a.situacao));
+  document.getElementById('rodada').innerHTML = lista.map(l => {
+    const i = l.idoso, risco = tipo === 'CALOR' ? i.riscoCalor : i.riscoChuva;
+    const tel = i.telefone || i.telefoneFixo;
+    const fam = soDigitos(i.contatoFamiliar).match(/\d{10,11}/);
+    const msg = encodeURIComponent(`Olá! Sou ${l.nomeVoluntario}, do Plantão Clima. Estamos acompanhando ${i.nome} no alerta de ${tipo === 'CALOR' ? 'calor' : 'chuva'} de hoje.`);
+    const aberta = l.resultado === 'PENDENTE';
+    return `
+    <div class="col-12 col-md-6 col-xl-4"><article id="lig-${l.idIdoso}" class="card ligacao s-${l.situacao}"><div class="card-body p-3 p-md-4">
+      <div class="d-flex justify-content-between align-items-start gap-2">
+        <h3>${esc(i.nome)}, ${i.idade} anos</h3>
+        ${badgeRisco(risco)}
+      </div>
+      <p class="quem">${l.tentativa === 1 ? 'Titular' : 'Reserva'}: ${esc(l.nomeVoluntario)}${i.enderecoRef ? `<br>${esc(i.enderecoRef)}` : ''}</p>
+      ${aberta ? `
+        <a class="btn btn-primary btn-ligar" href="tel:${esc(tel)}">${ICONE_TEL} Ligar agora ${esc(tel)}</a>
+        <div class="respostas">
+          <button class="btn btn-success" onclick="registrar(${l.id}, 'OK')">Está bem</button>
+          <button class="btn btn-warning" onclick="abrir(${l.id}, 'ATENCAO')">Precisa de atenção</button>
+          <button class="btn btn-danger" onclick="abrir(${l.id}, 'URGENTE')">Precisa de ajuda</button>
+          <button class="btn btn-outline-dark" onclick="registrar(${l.id}, 'NAO_ATENDEU')">Não atendeu</button>
+        </div>
+        <div id="extra-${l.id}" class="mt-2"></div>` : `
+        <p class="situacao">${SITUACAO[l.situacao]}</p>
+        <p class="mb-0 small">${l.dataHora ? 'Registrado em ' + dataBr(l.dataHora) : ''}${l.observacao ? '. ' + esc(l.observacao) : ''}</p>`}
+      ${fam ? `<a class="btn btn-outline-success btn-sm mt-3" target="_blank" rel="noopener" href="https://wa.me/55${fam[0]}?text=${msg}">Avisar a família no WhatsApp</a>` : ''}
+    </div></article></div>`;
+  }).join('') || '<p class="col-12">Nenhuma ligação para esse voluntário.</p>';
+}
+
+// ATENCAO mostra o checklist; URGENTE mostra o numero de emergencia antes de qualquer campo
+function abrir(id, resultado) {
+  const tipo = painel.alerta.tipo;
+  const urgente = resultado === 'URGENTE';
+  const numeros = tipo === 'CALOR' ? [['192', 'SAMU']] : [['193', 'Bombeiros'], ['199', 'Defesa Civil'], ['192', 'SAMU']];
+  document.getElementById('extra-' + id).innerHTML = `
+    ${urgente ? numeros.map(([n, nome]) => `<a class="btn btn-danger btn-lg w-100 mb-2" href="tel:${n}">${ICONE_TEL} Ligar ${n} (${nome})</a>`).join('') : `
+      <ul class="mb-1 mt-2">${CHECKLIST[tipo].map(t => `<li>${esc(t)}</li>`).join('')}</ul><p class="small text-body-secondary">${FONTE[tipo]}</p>`}
+    <label for="obs-${id}" class="form-label">Observação (opcional)</label>
+    <textarea id="obs-${id}" class="form-control mb-2" maxlength="300" rows="2"></textarea>
+    <button class="btn ${urgente ? 'btn-danger' : 'btn-warning'} w-100" onclick="registrar(${id}, '${resultado}')">${urgente ? 'Já acionei a ajuda: registrar' : 'Registrar atenção'}</button>`;
+  document.querySelector(`#extra-${id} a, #extra-${id} textarea`).focus();
+}
+
+async function registrar(id, resultado, canal = 'LIGACAO', depois) {
+  const obs = document.getElementById('obs-' + id);
+  if (obs && obs.value.length > 300) return avisar('Observação com no máximo 300 caracteres.', 'danger');
+  const r = await tentar(() => api('checagens', {
+    id, resultado, canal, observacao: obs ? obs.value : '',
+    registradoDepois: depois || document.getElementById('depois').checked ? 'S' : 'N'
+  }));
+  if (!r) return;
+  avisar(r.mensagem, r.mensagem.startsWith('CRÍTICO') ? 'danger' : r.mensagem.startsWith('Ligue') ? 'warning' : 'success');
+  await carregar(painel.alerta.id);
+}
+
+function visita(idChecagem) {
+  registrar(idChecagem, 'OK', 'VISITA', true);
+}
+
+function desenharImpressao(regiao) {
+  const a = painel.alerta;
+  document.getElementById('impressao').innerHTML = `
+    <h1>Plantão Clima: ${a.tipo === 'CALOR' ? 'calor' : 'chuva'} em ${esc(regiao)}, ${dataBr(a.dataAlerta)}</h1>
+    <p>Marque o resultado e lance no sistema depois (opção "Estou passando para o sistema ligações anotadas no papel"). Se ninguém atender (nem o reserva, quando houver), peça para alguém ir até a casa; se ninguém abrir, ligue 193/192.</p>
+    <table class="table table-bordered"><thead><tr><th>Idoso</th><th>Telefone</th><th>Endereço</th><th>Voluntário</th><th>Resultado</th></tr></thead><tbody>
+    ${painel.rodada.map(l => `<tr><td>${esc(l.idoso.nome)}</td><td>${esc([l.idoso.telefone, l.idoso.telefoneFixo].filter(Boolean).join(' / '))}</td>
+      <td>${esc(l.idoso.enderecoRef || '')}</td><td>${l.tentativa === 1 ? 'Titular' : 'Reserva'}: ${esc(l.nomeVoluntario)}</td>
+      <td><span class="caixa"></span>Bem<span class="caixa"></span>Atenção<span class="caixa"></span>Ajuda<span class="caixa"></span>Não atendeu</td></tr>`).join('')}
+    </tbody></table>`;
+}
+
+// cartoes e alertas anteriores: abrem a rodada sem recarregar a pagina
+for (const id of ['cartoes', 'anteriores']) {
+  document.getElementById(id).addEventListener('click', e => {
+    const a = e.target.closest('a[data-id]');
+    if (!a) return;
+    e.preventDefault();
+    selecionar(Number(a.dataset.id), true);
+  });
+}
+document.querySelectorAll('[name=camada]').forEach(i => i.addEventListener('change', desenharCamada));
+document.getElementById('filtro').addEventListener('change', desenharRodada);
+document.getElementById('atualizar').addEventListener('click', () => carregar(painel && painel.alerta.id).then(desenharAvisos));
+carregar(new URLSearchParams(location.search).get('alerta')).then(() => { desenharCamada(); desenharAvisos(); carregarClima(); });
+// painel ao vivo: recarrega a cada minuto, mas nao enquanto a pessoa usa um botao ou campo, ou tem um checklist aberto
+setInterval(() => {
+  const foco = document.activeElement;
+  if (!document.hidden && !foco.closest('input, textarea, select, button, a, .leaflet-container')
+      && !document.querySelector('[id^="extra-"]:not(:empty)')) carregar(painel && painel.alerta.id);
+}, 60000);
+</script>
 </body>
 </html>
