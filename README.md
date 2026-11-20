@@ -4,6 +4,8 @@ Global Solution 2026/2 (CitizenTech) · FIAP · Engenharia de Software · 2ESOA
 
 **Vídeo pitch (até 3 min):** [PREENCHER: link público do YouTube, Google Drive ou Vimeo]
 
+**Versão online:** https://plantao-clima-gabriel.vercel.app (o mesmo servidor Java + H2 deste projeto, rodando num container na Vercel; o banco volta aos dados iniciais quando o servidor reinicia).
+
 ## Problema
 
 No Censo 2022, 5,6 milhões de pessoas de 60 anos ou mais moram sozinhas no Brasil (1,3 milhão em SP).
